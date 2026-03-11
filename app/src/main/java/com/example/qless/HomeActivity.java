@@ -8,6 +8,7 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +20,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
@@ -303,6 +305,19 @@ public class HomeActivity extends AppCompatActivity {
             Map<String, Object> product = items.get(position);
             holder.txtProductName.setText((String) product.get("name"));
 
+            // Load product image
+            String imageUrl = (String) product.get("imageUrl");
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                Glide.with(holder.itemView.getContext())
+                        .load(imageUrl)
+                        .placeholder(R.drawable.placeholder_product)
+                        .error(R.drawable.placeholder_product)
+                        .centerCrop()
+                        .into(holder.imgProduct);
+            } else {
+                holder.imgProduct.setImageResource(R.drawable.placeholder_product);
+            }
+
             List<Map<String, Object>> prices = (List<Map<String, Object>>) product.get("prices");
             if (prices != null && !prices.isEmpty()) {
                 // Find cheapest price
@@ -350,6 +365,7 @@ public class HomeActivity extends AppCompatActivity {
 
         class VH extends RecyclerView.ViewHolder {
             TextView txtProductName, txtStoreName, txtPrice, txtOriginalPrice, txtDiscount, txtStoreCount;
+            ImageView imgProduct;
 
             VH(View v) {
                 super(v);
@@ -359,6 +375,7 @@ public class HomeActivity extends AppCompatActivity {
                 txtOriginalPrice = v.findViewById(R.id.txtOriginalPrice);
                 txtDiscount = v.findViewById(R.id.txtDiscount);
                 txtStoreCount = v.findViewById(R.id.txtStoreCount);
+                imgProduct = v.findViewById(R.id.imgProduct);
             }
         }
     }

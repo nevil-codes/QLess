@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -111,6 +113,19 @@ public class SearchActivity extends AppCompatActivity {
             h.txtName.setText((String) p.get("name"));
             h.txtCategory.setText(p.get("category") != null ? (String) p.get("category") : "");
 
+            // Load product image
+            String imageUrl = (String) p.get("imageUrl");
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                Glide.with(h.itemView.getContext())
+                        .load(imageUrl)
+                        .placeholder(R.drawable.placeholder_product)
+                        .error(R.drawable.placeholder_product)
+                        .centerCrop()
+                        .into(h.imgProduct);
+            } else {
+                h.imgProduct.setImageResource(R.drawable.placeholder_product);
+            }
+
             List<Map<String, Object>> prices = (List<Map<String, Object>>) p.get("prices");
             if (prices != null && !prices.isEmpty()) {
                 double cheapest = Double.MAX_VALUE;
@@ -131,12 +146,14 @@ public class SearchActivity extends AppCompatActivity {
 
         class VH extends RecyclerView.ViewHolder {
             TextView txtName, txtCategory, txtPrice, txtStoreCount;
+            ImageView imgProduct;
             VH(View v) {
                 super(v);
                 txtName = v.findViewById(R.id.txtProductName);
                 txtCategory = v.findViewById(R.id.txtCategory);
                 txtPrice = v.findViewById(R.id.txtPrice);
                 txtStoreCount = v.findViewById(R.id.txtStoreCount);
+                imgProduct = v.findViewById(R.id.imgProduct);
             }
         }
     }

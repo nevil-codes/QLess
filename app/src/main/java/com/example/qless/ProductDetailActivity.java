@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,6 +14,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -74,6 +77,18 @@ public class ProductDetailActivity extends AppCompatActivity {
 
                     Object desc = doc.get("description");
                     txtDescription.setText(desc != null ? (String) desc : "");
+
+                    // Load product image from Firestore imageUrl field
+                    String imageUrl = doc.getString("imageUrl");
+                    ImageView imgProduct = findViewById(R.id.imgProduct);
+                    if (imageUrl != null && !imageUrl.isEmpty()) {
+                        Glide.with(ProductDetailActivity.this)
+                                .load(imageUrl)
+                                .placeholder(R.drawable.placeholder_product)
+                                .error(R.drawable.placeholder_product)
+                                .centerCrop()
+                                .into(imgProduct);
+                    }
 
                     Object rating = doc.get("rating");
                     if (rating != null) txtRating.setText(String.format(Locale.getDefault(), "%.1f", ((Number) rating).doubleValue()));

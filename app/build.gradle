@@ -53,6 +53,7 @@ dependencies {
     // UI
     implementation libs.recyclerview
     implementation libs.cardview
+    implementation libs.glide
     
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
