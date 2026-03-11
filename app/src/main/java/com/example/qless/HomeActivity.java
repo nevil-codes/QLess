@@ -42,12 +42,13 @@ public class HomeActivity extends AppCompatActivity {
     private static final int LOCATION_PERMISSION_CODE = 1001;
 
     private TextView txtGreeting, txtLocation;
-    private RecyclerView rvDeals, rvStores;
-    private LinearLayout categoriesContainer;
+    private RecyclerView rvDeals, rvStores, rvRecommended;
+    private LinearLayout categoriesContainer, recommendedSection;
 
     private FusedLocationProviderClient fusedLocationClient;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private RecommendationEngine recEngine;
 
     private double userLat = 0, userLng = 0;
 
@@ -67,6 +68,7 @@ public class HomeActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        recEngine = new RecommendationEngine();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         initViews();
@@ -84,6 +86,10 @@ public class HomeActivity extends AppCompatActivity {
 
         rvDeals.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvStores.setLayoutManager(new LinearLayoutManager(this));
+
+        rvRecommended = findViewById(R.id.rvRecommended);
+        recommendedSection = findViewById(R.id.recommendedSection);
+        rvRecommended.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         txtLocation.setText(getString(R.string.detecting_location));
 
@@ -168,6 +174,7 @@ public class HomeActivity extends AppCompatActivity {
                 txtLocation.setText(getString(R.string.no_location));
                 loadDeals();
                 loadStores();
+                loadRecommendations();
             }
         }
     }
@@ -189,11 +196,13 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     loadDeals();
                     loadStores();
+                    loadRecommendations();
                 })
                 .addOnFailureListener(e -> {
                     txtLocation.setText(getString(R.string.no_location));
                     loadDeals();
                     loadStores();
+                    loadRecommendations();
                 });
     }
 
@@ -216,6 +225,16 @@ public class HomeActivity extends AppCompatActivity {
         } catch (IOException e) {
             txtLocation.setText(getString(R.string.no_location));
         }
+    }
+
+    // ---- Load ML recommendations ----
+    private void loadRecommendations() {
+        recEngine.getRecommendations(recommended -> {
+            if (!recommended.isEmpty()) {
+                recommendedSection.setVisibility(View.VISIBLE);
+                rvRecommended.setAdapter(new DealsAdapter(recommended));
+            }
+        });
     }
 
     // ---- Load products from Firestore ----

@@ -117,4 +117,7 @@
     <string name="add_to_cart">Add to Cart</string>
     <string name="added_to_cart">Added to cart!</string>
     <string name="product_details">Product Details</string>
+    <string name="similar_products">Similar Products</string>
+    <string name="people_also_buy">People Also Buy</string>
+    <string name="recommended_for_you">Recommended For You</string>
 </resources>

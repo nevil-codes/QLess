@@ -55,6 +55,10 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 filterProducts(s.toString());
+                // Log search queries for ML (only meaningful queries)
+                if (s.length() >= 3) {
+                    EventLogger.getInstance().logSearch(s.toString());
+                }
             }
         });
 
