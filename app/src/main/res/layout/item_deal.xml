@@ -19,11 +19,13 @@
             android:layout_width="match_parent"
             android:layout_height="120dp">
 
-            <View
+            <ImageView
                 android:id="@+id/imgProduct"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/surface_variant" />
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:src="@drawable/placeholder_product" />
 
             <TextView
                 android:id="@+id/txtDiscount"

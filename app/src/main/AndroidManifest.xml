@@ -39,6 +39,23 @@
             android:name=".HomeActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".SearchActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".CartActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ProductDetailActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

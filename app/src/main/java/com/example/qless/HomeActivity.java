@@ -1,6 +1,7 @@
 package com.example.qless;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -83,6 +84,31 @@ public class HomeActivity extends AppCompatActivity {
         rvStores.setLayoutManager(new LinearLayoutManager(this));
 
         txtLocation.setText(getString(R.string.detecting_location));
+
+        // Search bar → SearchActivity
+        findViewById(R.id.searchBar).setOnClickListener(v ->
+                startActivity(new Intent(this, SearchActivity.class)));
+
+        // Bottom Navigation
+        com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setSelectedItemId(R.id.nav_home);
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) return true;
+            if (id == R.id.nav_search) {
+                startActivity(new Intent(this, SearchActivity.class));
+                return true;
+            }
+            if (id == R.id.nav_cart) {
+                startActivity(new Intent(this, CartActivity.class));
+                return true;
+            }
+            if (id == R.id.nav_profile) {
+                startActivity(new Intent(this, ProfileActivity.class));
+                return true;
+            }
+            return false;
+        });
     }
 
     private void loadUserGreeting() {
@@ -308,6 +334,13 @@ public class HomeActivity extends AppCompatActivity {
 
                 holder.txtStoreCount.setText("Available in " + prices.size() + " store" + (prices.size() > 1 ? "s" : ""));
             }
+
+            // Click to view product detail with all store prices
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(HomeActivity.this, ProductDetailActivity.class);
+                intent.putExtra("productId", (String) product.get("id"));
+                startActivity(intent);
+            });
         }
 
         @Override
