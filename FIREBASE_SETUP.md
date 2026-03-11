@@ -55,37 +55,56 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Users collection - users can only access their own data
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+    // Helper function: Check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
     }
     
-    // Products collection - anyone can read, authenticated users can write
+    // Helper function: Check if user owns the document
+    function isOwner(userId) {
+      return isAuth() && request.auth.uid == userId;
+    }
+    
+    // Users - users can only access their own profile
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Products - public read, authenticated write
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAuth();
     }
     
-    // Stores collection - anyone can read, authenticated users can write
+    // Stores - public read, authenticated write
     match /stores/{storeId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAuth();
     }
     
-    // Orders collection - authenticated users can read/write
-    match /orders/{orderId} {
-      allow read, write: if request.auth != null;
-    }
-    
-    // Reservations collection - users can access their own reservations
+    // Reservations - users access own, authenticated can read all (for admin)
     match /reservations/{reservationId} {
-      allow read, write: if request.auth != null;
+      allow read: if isAuth();
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuth() && resource.data.userId == request.auth.uid;
     }
     
-    // User events for ML - authenticated users can write
+    // Orders - same as reservations
+    match /orders/{orderId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuth();
+    }
+    
+    // User events for ML analytics
     match /user_events/{eventId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow read, write: if isAuth();
+    }
+    
+    // App config - public read, authenticated write
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAuth();
     }
   }
 }
@@ -93,61 +112,94 @@ service cloud.firestore {
 
 **Important:** After updating rules, click **Publish** to apply them.
 
-## Step 7: Google Sign-In Setup (Required)
-
-### 7.1 Enable Google Sign-In in Firebase
-1. Go to **Firebase Console > Authentication > Sign-in method**
-2. Click **Google** provider
-3. Toggle **Enable**
-4. Enter your **Project support email**
-5. Click **Save**
-
-### 7.2 Add SHA-1 Certificate Fingerprint
-1. Generate SHA-1 fingerprint:
-   ```bash
-   cd /Users/nick/AndroidStudioProjects/QLess
-   ./gradlew signingReport
-   ```
-2. Copy the **SHA1** value from the debug variant
-3. Go to **Firebase Console > Project Settings > Your apps**
-4. Click **Add fingerprint** and paste the SHA-1
-
-### 7.3 Download Updated google-services.json
-1. After adding SHA-1, download the **updated** `google-services.json`
-2. Replace the file at `app/google-services.json`
-3. The file should now contain `oauth_client` entries
-
-### 7.4 Get Web Client ID
-1. Go to **Firebase Console > Authentication > Sign-in method > Google**
-2. Expand Google and copy the **Web client ID** (looks like: `xxxxx.apps.googleusercontent.com`)
-3. Open `app/src/main/res/values/strings.xml`
-4. Replace the placeholder:
-   ```xml
-   <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_HERE</string>
-   ```
-   With your actual Web Client ID:
-   ```xml
-   <string name="default_web_client_id">123456789-abcdefg.apps.googleusercontent.com</string>
-   ```
-
-### 7.5 Verify OAuth Consent Screen
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Select your Firebase project
-3. Go to **APIs & Services > OAuth consent screen**
-4. Ensure the app is configured (even in Testing mode)
-5. Add test users if in Testing mode
-
 ## Data Structure
 
 ### Users Collection
 ```
-users/
-  {userId}/
-    firstName: string
-    lastName: string
-    email: string
-    phone: string
-    createdAt: timestamp
+users/{userId}/
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  photoUrl: string (optional)
+  authProvider: string (email/google)
+  createdAt: number (timestamp)
+```
+
+### Products Collection
+```
+products/{productId}/
+  name: string
+  brand: string
+  category: string
+  description: string
+  imageUrl: string
+  sku: string
+  rating: number
+  reviews: number
+  prices: [
+    {
+      storeId: string
+      storeName: string
+      price: number
+      originalPrice: number
+      quantity: number
+      inStock: boolean
+    }
+  ]
+  createdAt: number
+  updatedAt: number
+```
+
+### Stores Collection
+```
+stores/{storeId}/
+  name: string
+  category: string
+  phone: string
+  rating: number
+  reviews: number
+  address: {
+    formattedAddress: string
+    latitude: number
+    longitude: number
+  }
+```
+
+### Reservations Collection
+```
+reservations/{reservationId}/
+  reservationId: string
+  userId: string
+  items: [
+    {
+      productId: string
+      productName: string
+      storeName: string
+      price: number
+      quantity: number
+    }
+  ]
+  subtotal: number
+  serviceFee: number
+  total: number
+  storeName: string
+  status: string (reserved/picked_up/expired/cancelled)
+  createdAt: number
+  pickupDeadline: number
+```
+
+### User Events Collection (ML)
+```
+user_events/{eventId}/
+  userId: string
+  eventType: string (view/cart_add/purchase/search)
+  productId: string (optional)
+  productName: string (optional)
+  category: string (optional)
+  brand: string (optional)
+  searchQuery: string (optional)
+  timestamp: number
 ```
 
 ## Testing
@@ -156,10 +208,16 @@ users/
 2. Create a new account via Sign Up
 3. Check Firebase Console > Authentication for new user
 4. Check Firestore > users collection for user data
+5. Add products via Admin Panel
+6. Test checkout flow and verify reservations
 
 ## Troubleshooting
 
-- **Build fails**: Make sure `google-services.json` is valid
-- **Auth fails**: Check Firebase Authentication is enabled
-- **Firestore fails**: Check database rules allow write access
+| Problem | Solution |
+|---------|----------|
+| Build fails | Verify `google-services.json` is valid and up-to-date |
+| Auth fails | Enable Email/Password in Firebase Authentication |
+| Permission denied | Update Firestore rules and click Publish |
+| Reservations not showing | Check Logcat for errors, verify rules |
+| Location not working | Grant location permission in device settings |
 

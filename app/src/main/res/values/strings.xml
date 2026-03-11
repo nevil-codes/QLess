@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">QLess</string>
     <string name="app_motto">Compare. Reserve. Collect.</string>
     <string name="app_description">Smart shopping made simple. Find the best prices, reserve items instantly, and pick up when it suits you.</string>
@@ -192,7 +192,31 @@
     <string name="faq_question_3">Can I cancel my reservation?</string>
     <string name="faq_answer_3">Yes, you can cancel your reservation anytime before pickup. Full refunds are provided for cancellations made within 24 hours of the reservation.</string>
     <string name="faq_question_4">How do I pay for my items?</string>
-    <string name="faq_answer_4">Payment is made at the store when you pick up your items. Show your reservation code to the store staff and pay using cash, card, or mobile payment.</string>
+    <string name="faq_answer_4">You can pay securely using credit/debit card or Google Pay when you confirm your reservation. Your card will be charged immediately.</string>
+
+    <!-- Payment -->
+    <string name="payment">Payment</string>
+    <string name="amount_to_pay">Amount to Pay</string>
+    <string name="payment_method">Payment Method</string>
+    <string name="credit_debit_card">Credit / Debit Card</string>
+    <string name="visa_mastercard_amex">Visa, Mastercard, American Express</string>
+    <string name="fast_secure_payment">Fast and secure payment</string>
+    <string name="card_details">Card Details</string>
+    <string name="cardholder_name">Cardholder Name</string>
+    <string name="save_card_for_future">Save card for future payments</string>
+    <string name="secure_payment_info">Your payment is secured with 256-bit SSL encryption</string>
+    <string name="pay_now">Pay Now</string>
+    <string name="powered_by_stripe">Powered by Stripe</string>
+    <string name="processing_payment">Processing payment…</string>
+    <string name="payment_successful">Payment successful!</string>
+    <string name="payment_failed">Payment failed. Please try again.</string>
+    <string name="invalid_card">Please enter valid card details</string>
+    <string name="payment_cancelled">Payment cancelled</string>
+    <string name="payment_confirmation_message">Your reservation has been confirmed. Please pick up your items within 48 hours.</string>
+    <string name="order_id">Order ID</string>
+    <string name="pickup_before">Pick up before</string>
+    <string name="view_my_reservations">View My Reservations</string>
+    <string name="back_to_home">Back to Home</string>
 
     <!-- Colors for Status -->
     <string name="warning">Warning</string>

@@ -41,6 +41,7 @@ dependencies {
     implementation platform(libs.firebase.bom)
     implementation libs.firebase.auth
     implementation libs.firebase.firestore
+    implementation libs.firebase.functions
     
     // Google Sign-In
     implementation libs.credentials
@@ -54,6 +55,9 @@ dependencies {
     implementation libs.recyclerview
     implementation libs.cardview
     implementation libs.glide
+    
+    // Payment - Stripe
+    implementation libs.stripe.android
     
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

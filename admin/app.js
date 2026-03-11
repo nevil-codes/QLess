@@ -345,7 +345,15 @@ function loadOverview() {
     db.collection('products').get().then(s => document.getElementById('statProducts').textContent = s.size);
     db.collection('stores').get().then(s => document.getElementById('statStores').textContent = s.size);
     db.collection('users').get().then(s => document.getElementById('statUsers').textContent = s.size);
-    db.collection('orders').get().then(s => document.getElementById('statOrders').textContent = s.size);
+
+    // Count both orders and reservations
+    Promise.all([
+        db.collection('orders').get(),
+        db.collection('reservations').get()
+    ]).then(([ordersSnap, reservationsSnap]) => {
+        const totalOrders = ordersSnap.size + reservationsSnap.size;
+        document.getElementById('statOrders').textContent = totalOrders;
+    });
 
     // Recent events
     db.collection('user_events').orderBy('timestamp', 'desc').limit(20).get().then(snap => {
@@ -540,16 +548,28 @@ function addPriceRow(data) {
     div.className = 'price-row';
     const rowId = 'store-select-' + Date.now() + Math.random().toString(36).substr(2, 5);
     div.innerHTML = `
-        <div class="store-select-wrapper">
-            <input type="text" class="store-search-input" id="${rowId}" placeholder="Search store..." value="${data?.storeName || ''}" autocomplete="off">
-            <input type="hidden" class="store-id-input" value="${data?.storeId || ''}">
-            <div class="store-dropdown"></div>
+        <div class="price-row-store">
+            <label><i class="fas fa-store"></i> Store</label>
+            <div class="store-select-wrapper">
+                <input type="text" class="store-search-input" id="${rowId}" placeholder="Search or select a store..." value="${data?.storeName || ''}" autocomplete="off">
+                <input type="hidden" class="store-id-input" value="${data?.storeId || ''}">
+                <div class="store-dropdown"></div>
+            </div>
         </div>
-        <div class="price-row-inputs">
-            <input type="number" step="0.01" placeholder="Price €" value="${data?.price || ''}">
-            <input type="number" step="0.01" placeholder="Original €" value="${data?.originalPrice || ''}">
-            <input type="number" placeholder="Qty" value="${data?.quantity || ''}">
-            <button class="btn-remove" onclick="this.closest('.price-row').remove()"><i class="fas fa-times"></i></button>
+        <div class="price-row-fields">
+            <div class="price-row-field">
+                <label>Price (€)</label>
+                <input type="number" step="0.01" placeholder="0.00" value="${data?.price || ''}">
+            </div>
+            <div class="price-row-field">
+                <label>Original (€)</label>
+                <input type="number" step="0.01" placeholder="0.00" value="${data?.originalPrice || ''}">
+            </div>
+            <div class="price-row-field">
+                <label>Quantity</label>
+                <input type="number" placeholder="0" value="${data?.quantity || ''}">
+            </div>
+            <button class="btn-remove" title="Remove this store" onclick="this.closest('.price-row').remove()"><i class="fas fa-trash-alt"></i></button>
         </div>`;
     document.getElementById('priceRows').appendChild(div);
 
@@ -910,45 +930,97 @@ function deleteStore(id) {
 
 // ===== ORDERS =====
 function loadOrders() {
-    db.collection('orders').get().then(snap => {
-        const tbody = document.querySelector('#ordersTable tbody');
-        tbody.innerHTML = '';
+    const tbody = document.querySelector('#ordersTable tbody');
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:20px"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+    let allOrders = [];
+
+    // Load orders
+    const ordersPromise = db.collection('orders').get().then(snap => {
         snap.forEach(doc => {
             const o = doc.data();
-            const date = o.orderDate ? new Date(o.orderDate).toLocaleDateString() : '—';
-            const statusClass = o.status === 'completed' ? 'badge-green' : o.status === 'pending' ? 'badge-yellow' : 'badge-red';
-            tbody.innerHTML += `<tr>
-                <td>${doc.id.substring(0,8)}...</td>
-                <td>${o.userId?.substring(0,8) || '—'}...</td>
-                <td><strong>€${(o.totalAmount || 0).toFixed(2)}</strong></td>
-                <td><span class="badge ${statusClass}">${o.status || 'pending'}</span></td>
-                <td>${date}</td>
-                <td>
-                    <button class="btn btn-sm" onclick="updateOrderStatus('${doc.id}','completed')">✅</button>
-                    <button class="btn btn-danger btn-sm" onclick="updateOrderStatus('${doc.id}','cancelled')">❌</button>
-                </td>
-            </tr>`;
+            allOrders.push({
+                id: doc.id,
+                type: 'order',
+                storeName: o.storeName || '—',
+                total: o.totalAmount || 0,
+                status: o.status || 'pending',
+                paymentStatus: o.paymentStatus || 'unknown',
+                date: o.orderDate || o.createdAt,
+                userId: o.userId
+            });
         });
-        if (snap.empty) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9CA3AF">No orders yet</td></tr>';
     });
 
-    // Also load reservations
-    db.collection('reservations').get().then(snap => {
-        const tbody = document.querySelector('#ordersTable tbody');
+    // Load reservations (this is where app stores checkout data)
+    const reservationsPromise = db.collection('reservations').get().then(snap => {
         snap.forEach(doc => {
             const r = doc.data();
-            const date = r.reservedAt ? new Date(r.reservedAt).toLocaleDateString() : '—';
-            const statusClass = r.status === 'collected' ? 'badge-green' : r.status === 'reserved' ? 'badge-blue' : r.status === 'expired' ? 'badge-red' : 'badge-yellow';
+            // Handle different field names - app uses total and createdAt
+            const total = r.total || r.totalAmount || 0;
+            const timestamp = r.createdAt || r.reservedAt;
+            const storeName = r.storeName || (r.items && r.items[0]?.storeName) || '—';
+
+            allOrders.push({
+                id: doc.id,
+                type: 'reservation',
+                storeName: storeName,
+                total: total,
+                status: r.status || 'pending',
+                paymentStatus: r.paymentStatus || 'unknown',
+                date: timestamp,
+                userId: r.userId,
+                items: r.items
+            });
+        });
+    });
+
+    // Render after both load
+    Promise.all([ordersPromise, reservationsPromise]).then(() => {
+        tbody.innerHTML = '';
+
+        if (allOrders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:40px"><i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:12px"></i>No orders or reservations yet</td></tr>';
+            return;
+        }
+
+        // Sort by date descending
+        allOrders.sort((a, b) => (b.date || 0) - (a.date || 0));
+
+        allOrders.forEach(order => {
+            const date = order.date ? new Date(order.date).toLocaleDateString() : '—';
+
+            // Status badge class
+            let statusClass = 'badge-yellow';
+            if (order.status === 'collected' || order.status === 'completed') statusClass = 'badge-green';
+            else if (order.status === 'reserved') statusClass = 'badge-blue';
+            else if (order.status === 'expired' || order.status === 'cancelled') statusClass = 'badge-red';
+            else if (order.status === 'pending_payment') statusClass = 'badge-yellow';
+
+            // Payment badge class
+            let paymentClass = 'badge-yellow';
+            if (order.paymentStatus === 'paid') paymentClass = 'badge-green';
+            else if (order.paymentStatus === 'failed') paymentClass = 'badge-red';
+            else if (order.paymentStatus === 'pending') paymentClass = 'badge-yellow';
+
+            const isReservation = order.type === 'reservation';
+            const actionButtons = isReservation ? `
+                <button class="btn btn-sm" title="Mark as Collected" onclick="updateReservation('${order.id}','collected')">📦</button>
+                <button class="btn btn-danger btn-sm" title="Mark as Expired" onclick="updateReservation('${order.id}','expired')">⏰</button>
+                <button class="btn btn-sm" title="View Details" onclick="viewOrderDetails('${order.id}', 'reservation')"><i class="fas fa-eye"></i></button>
+            ` : `
+                <button class="btn btn-sm" title="Mark as Completed" onclick="updateOrderStatus('${order.id}','completed')">✅</button>
+                <button class="btn btn-danger btn-sm" title="Cancel" onclick="updateOrderStatus('${order.id}','cancelled')">❌</button>
+            `;
+
             tbody.innerHTML += `<tr>
-                <td>R-${doc.id.substring(0,6)}</td>
-                <td>${r.userId?.substring(0,8) || '—'}...</td>
-                <td><strong>€${(r.totalAmount || 0).toFixed(2)}</strong></td>
-                <td><span class="badge ${statusClass}">${r.status || 'pending'}</span></td>
+                <td title="${order.id}">${order.id.substring(0,12)}...</td>
+                <td><strong>${order.storeName}</strong></td>
+                <td><strong>€${order.total.toFixed(2)}</strong></td>
+                <td><span class="badge ${statusClass}">${order.status}</span></td>
+                <td><span class="badge ${paymentClass}">${order.paymentStatus}</span></td>
                 <td>${date}</td>
-                <td>
-                    <button class="btn btn-sm" onclick="updateReservation('${doc.id}','collected')">📦</button>
-                    <button class="btn btn-danger btn-sm" onclick="updateReservation('${doc.id}','expired')">⏰</button>
-                </td>
+                <td>${actionButtons}</td>
             </tr>`;
         });
     });
@@ -959,6 +1031,73 @@ function updateOrderStatus(id, status) {
 }
 function updateReservation(id, status) {
     db.collection('reservations').doc(id).update({ status }).then(() => { toast('Reservation ' + status); loadOrders(); });
+}
+
+function viewOrderDetails(id, type) {
+    const collection = type === 'reservation' ? 'reservations' : 'orders';
+
+    db.collection(collection).doc(id).get().then(doc => {
+        if (!doc.exists) {
+            toast('Order not found');
+            return;
+        }
+
+        const data = doc.data();
+
+        // Fill in details
+        document.getElementById('orderDetailId').textContent = id;
+        document.getElementById('orderDetailStore').textContent = data.storeName || (data.items && data.items[0]?.storeName) || '—';
+        document.getElementById('orderDetailStatus').innerHTML = `<span class="badge ${getStatusClass(data.status)}">${data.status || 'pending'}</span>`;
+        document.getElementById('orderDetailPayment').innerHTML = `<span class="badge ${getPaymentClass(data.paymentStatus)}">${data.paymentStatus || 'unknown'}</span>`;
+
+        // Dates
+        const createdDate = data.createdAt || data.reservedAt;
+        document.getElementById('orderDetailDate').textContent = createdDate ? new Date(createdDate).toLocaleString() : '—';
+        document.getElementById('orderDetailDeadline').textContent = data.pickupDeadline ? new Date(data.pickupDeadline).toLocaleString() : '—';
+
+        // Items
+        const itemsTbody = document.querySelector('#orderItemsTable tbody');
+        itemsTbody.innerHTML = '';
+        const items = data.items || [];
+        items.forEach(item => {
+            const itemTotal = (item.price || 0) * (item.quantity || 1);
+            itemsTbody.innerHTML += `<tr>
+                <td>${item.productName || item.name || '—'}</td>
+                <td>${item.quantity || 1}</td>
+                <td>€${itemTotal.toFixed(2)}</td>
+            </tr>`;
+        });
+
+        if (items.length === 0) {
+            itemsTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#9CA3AF">No items</td></tr>';
+        }
+
+        // Totals
+        document.getElementById('orderDetailSubtotal').textContent = `€${(data.subtotal || 0).toFixed(2)}`;
+        document.getElementById('orderDetailFee').textContent = `€${(data.serviceFee || 0).toFixed(2)}`;
+        document.getElementById('orderDetailTotal').textContent = `€${(data.total || data.totalAmount || 0).toFixed(2)}`;
+
+        document.getElementById('orderModal').style.display = 'flex';
+    }).catch(e => {
+        toast('Error loading order: ' + e.message);
+    });
+}
+
+function getStatusClass(status) {
+    if (status === 'collected' || status === 'completed') return 'badge-green';
+    if (status === 'reserved') return 'badge-blue';
+    if (status === 'expired' || status === 'cancelled') return 'badge-red';
+    return 'badge-yellow';
+}
+
+function getPaymentClass(status) {
+    if (status === 'paid') return 'badge-green';
+    if (status === 'failed') return 'badge-red';
+    return 'badge-yellow';
+}
+
+function closeOrderModal() {
+    document.getElementById('orderModal').style.display = 'none';
 }
 
 // ===== USERS =====

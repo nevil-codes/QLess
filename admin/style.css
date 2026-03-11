@@ -144,21 +144,35 @@ body { font-family:'Inter',sans-serif; background:#F9FAFB; color:#1F2937; }
 #uploadProgressText { font-size:12px; color:#6B7280; }
 
 /* Store Select Dropdown in Price Rows */
-.store-select-wrapper { position:relative; flex:1; }
-.store-search-input { width:100%; padding:8px 10px; border:1.5px solid #D1D5DB; border-radius:8px; font-size:13px; }
-.store-dropdown { position:absolute; top:100%; left:0; right:0; background:#fff; border:1.5px solid #D1D5DB; border-radius:8px; margin-top:4px; max-height:180px; overflow-y:auto; z-index:100; display:none; box-shadow:0 4px 12px rgba(0,0,0,.15); }
+.store-select-wrapper { position:relative; }
+.store-search-input { width:100%; padding:12px 14px; border:1.5px solid #D1D5DB; border-radius:10px; font-size:14px; transition:.2s; }
+.store-search-input:focus { outline:none; border-color:#6366F1; box-shadow:0 0 0 3px rgba(99,102,241,.1); }
+.store-dropdown { position:absolute; top:100%; left:0; right:0; background:#fff; border:1.5px solid #D1D5DB; border-radius:10px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:100; display:none; box-shadow:0 4px 16px rgba(0,0,0,.15); }
 .store-dropdown.show { display:block; }
-.store-dropdown-item { padding:10px 12px; cursor:pointer; font-size:13px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:10px; }
+.store-dropdown-item { padding:12px 14px; cursor:pointer; font-size:14px; border-bottom:1px solid #F3F4F6; display:flex; align-items:center; gap:12px; }
 .store-dropdown-item:last-child { border-bottom:none; }
 .store-dropdown-item:hover { background:#EEF2FF; }
-.store-dropdown-item i { color:#6366F1; font-size:14px; }
+.store-dropdown-item i { color:#6366F1; font-size:16px; }
 .store-dropdown-item .store-name { font-weight:500; color:#1F2937; }
-.store-dropdown-item .store-category { font-size:11px; color:#6B7280; margin-top:2px; }
+.store-dropdown-item .store-category { font-size:12px; color:#6B7280; margin-top:2px; }
 .store-dropdown-item.no-results { color:#9CA3AF; cursor:default; }
 .store-dropdown-item.no-results:hover { background:transparent; }
 
-/* Update price row for new layout */
-.price-row { display:grid; grid-template-columns:1.5fr 100px 100px 80px 40px; gap:8px; align-items:start; margin-bottom:8px; }
+/* Price Row - Improved Layout */
+.store-prices-header { display:flex; justify-content:space-between; align-items:center; margin-top:24px; margin-bottom:8px; padding-bottom:12px; border-bottom:2px solid #E5E7EB; }
+.store-prices-header h4 { font-size:16px; font-weight:600; color:#1F2937; display:flex; align-items:center; gap:8px; margin:0; }
+.store-prices-header h4 i { color:#6366F1; }
+.store-prices-hint { font-size:13px; color:#6B7280; margin-bottom:16px; }
+.price-row { background:#F9FAFB; border-radius:12px; padding:16px; margin-bottom:12px; border:1px solid #E5E7EB; }
+.price-row-store { margin-bottom:12px; }
+.price-row-store label { display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:6px; }
+.price-row-fields { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:12px; align-items:end; }
+.price-row-field { display:flex; flex-direction:column; }
+.price-row-field label { display:block; font-size:11px; font-weight:500; color:#6B7280; margin-bottom:4px; text-transform:uppercase; }
+.price-row-field input { padding:10px 12px; border:1.5px solid #D1D5DB; border-radius:8px; font-size:14px; width:100%; transition:.2s; }
+.price-row-field input:focus { outline:none; border-color:#6366F1; box-shadow:0 0 0 3px rgba(99,102,241,.1); }
+.price-row .btn-remove { background:#FEE2E2; color:#EF4444; border:none; border-radius:8px; width:40px; height:40px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:.2s; flex-shrink:0; }
+.price-row .btn-remove:hover { background:#EF4444; color:#fff; }
 
 /* Product Name Autocomplete */
 .product-name-autocomplete { position:relative; }
@@ -198,6 +212,15 @@ body { font-family:'Inter',sans-serif; background:#F9FAFB; color:#1F2937; }
 .category-chip.active i { color:#fff; }
 
 /* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Order Details Modal */
+.order-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.order-detail-item { background:#F9FAFB; padding:12px 16px; border-radius:10px; }
+.order-detail-item label { display:block; font-size:11px; text-transform:uppercase; color:#6B7280; font-weight:600; margin-bottom:4px; }
+.order-detail-item span { font-size:14px; font-weight:500; color:#1F2937; word-break:break-all; }
+.order-totals { margin-top:20px; background:#F9FAFB; border-radius:12px; padding:16px; }
+.order-total-row { display:flex; justify-content:space-between; padding:8px 0; font-size:14px; }
+.order-total-row.total { border-top:2px solid #E5E7EB; margin-top:8px; padding-top:12px; font-weight:700; font-size:16px; color:#6366F1; }
 
 /* Large tablets and small desktops */
 @media(max-width:1200px) {
@@ -253,10 +276,12 @@ body { font-family:'Inter',sans-serif; background:#F9FAFB; color:#1F2937; }
     .form-row { grid-template-columns:1fr; gap:12px; }
     .form-group input, .form-group select, .form-group textarea { padding:12px 14px; }
 
-    /* Price rows */
-    .price-row { padding:10px; }
-    .price-row-inputs { grid-template-columns:1fr 1fr; }
-    .store-select-wrapper { grid-column:1 / -1; }
+    /* Price rows - Mobile */
+    .price-row { padding:14px; }
+    .price-row-fields { grid-template-columns:1fr 1fr; gap:10px; }
+    .price-row .btn-remove { grid-column:1 / -1; width:100%; height:36px; margin-top:4px; }
+    .store-prices-header { flex-direction:column; gap:12px; align-items:stretch; }
+    .store-prices-header .btn { width:100%; justify-content:center; }
 
     /* Category slider */
     .slider-arrow { display:none; }
@@ -270,6 +295,9 @@ body { font-family:'Inter',sans-serif; background:#F9FAFB; color:#1F2937; }
 
     /* Buttons */
     .btn { padding:12px 20px; }
+
+    /* Order details grid */
+    .order-detail-grid { grid-template-columns:1fr; }
 }
 
 /* Small mobile devices */
@@ -284,8 +312,10 @@ body { font-family:'Inter',sans-serif; background:#F9FAFB; color:#1F2937; }
 
     .modal-body { padding:16px; }
 
-    .price-row-inputs { grid-template-columns:1fr; }
-    .price-row .btn-remove { width:100%; height:40px; margin-top:8px; }
+    /* Price rows - Small Mobile */
+    .price-row { padding:12px; }
+    .price-row-fields { grid-template-columns:1fr; }
+    .price-row-field { margin-bottom:0; }
 
     .table { font-size:12px; min-width:500px; }
     .table th, .table td { padding:8px 10px; }

@@ -143,8 +143,8 @@
 
         <!-- ORDERS -->
         <div id="page-orders" class="page">
-            <div class="page-header"><h3>Orders &amp; Reservations</h3></div>
-            <div class="card"><table class="table" id="ordersTable"><thead><tr><th>ID</th><th>User</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+            <div class="page-header"><h3>Orders &amp; Reservations</h3><button class="btn btn-outline" onclick="loadOrders()"><i class="fas fa-sync-alt"></i> Refresh</button></div>
+            <div class="card"><table class="table" id="ordersTable"><thead><tr><th>Order ID</th><th>Store</th><th>Total</th><th>Status</th><th>Payment</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
         </div>
 
         <!-- USERS -->
@@ -198,8 +198,13 @@
             </div>
             <div id="imagePreview" class="image-preview"></div>
             <div id="imageUploadProgress" class="upload-progress" style="display:none"><div class="progress-bar"><div class="progress-fill" id="uploadProgressFill"></div></div><span id="uploadProgressText">Uploading...</span></div>
-            <div class="form-row"><div class="form-group"><label>Rating</label><input type="number" id="prodRating" step="0.1" min="0" max="5"></div><div class="form-group"><label>Reviews</label><input type="number" id="prodReviews"></div></div>
-            <h4 style="margin-top:20px">Store Prices <button class="btn btn-sm" onclick="addPriceRow()"><i class="fas fa-plus"></i> Add Store</button></h4>
+            <div class="form-row"><div class="form-group"><label>Rating</label><input type="number" id="prodRating" step="0.1" min="0" max="5" placeholder="0.0"></div><div class="form-group"><label>Reviews</label><input type="number" id="prodReviews" placeholder="0"></div></div>
+
+            <div class="store-prices-header">
+                <h4><i class="fas fa-tags"></i> Store Prices</h4>
+                <button class="btn btn-primary btn-sm" onclick="addPriceRow()"><i class="fas fa-plus"></i> Add Store Price</button>
+            </div>
+            <p class="store-prices-hint">Add pricing information for each store that sells this product.</p>
             <div id="priceRows"></div>
         </div>
         <div class="modal-footer"><button class="btn btn-outline" onclick="closeProductModal()">Cancel</button><button class="btn btn-primary" onclick="saveProduct()">Save Product</button></div>
@@ -224,6 +229,34 @@
             </div>
         </div>
         <div class="modal-footer"><button class="btn btn-outline" onclick="closeStoreModal()">Cancel</button><button class="btn btn-primary" onclick="saveStore()">Save Store</button></div>
+    </div>
+</div>
+
+<!-- ORDER DETAILS MODAL -->
+<div id="orderModal" class="modal" style="display:none">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Order Details</h3><button class="btn-close" onclick="closeOrderModal()">&times;</button></div>
+        <div class="modal-body">
+            <div class="order-detail-grid">
+                <div class="order-detail-item"><label>Order ID</label><span id="orderDetailId">—</span></div>
+                <div class="order-detail-item"><label>Store</label><span id="orderDetailStore">—</span></div>
+                <div class="order-detail-item"><label>Status</label><span id="orderDetailStatus">—</span></div>
+                <div class="order-detail-item"><label>Payment</label><span id="orderDetailPayment">—</span></div>
+                <div class="order-detail-item"><label>Date</label><span id="orderDetailDate">—</span></div>
+                <div class="order-detail-item"><label>Pickup Deadline</label><span id="orderDetailDeadline">—</span></div>
+            </div>
+            <h4 style="margin:20px 0 12px">Items</h4>
+            <table class="table" id="orderItemsTable">
+                <thead><tr><th>Product</th><th>Qty</th><th>Price</th></tr></thead>
+                <tbody></tbody>
+            </table>
+            <div class="order-totals">
+                <div class="order-total-row"><span>Subtotal</span><span id="orderDetailSubtotal">€0.00</span></div>
+                <div class="order-total-row"><span>Service Fee</span><span id="orderDetailFee">€0.00</span></div>
+                <div class="order-total-row total"><span>Total</span><span id="orderDetailTotal">€0.00</span></div>
+            </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline" onclick="closeOrderModal()">Close</button></div>
     </div>
 </div>
 

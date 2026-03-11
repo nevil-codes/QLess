@@ -1,19 +1,15 @@
 # QLess 🛒
 
 <p align="center">
-  <img src="app/src/main/res/drawable/ic_logo_minimal.xml" width="120" alt="QLess Logo">
-</p>
-
-<p align="center">
   <b>Compare. Reserve. Collect.</b>
 </p>
 
 <p align="center">
   <a href="#features">Features</a> •
   <a href="#how-it-works">How It Works</a> •
-  <a href="#screenshots">Screenshots</a> •
   <a href="#tech-stack">Tech Stack</a> •
-  <a href="#getting-started">Getting Started</a>
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#admin-panel">Admin Panel</a>
 </p>
 
 ---
@@ -26,46 +22,72 @@ No more wandering through crowded stores or missing out on the best deals. QLess
 
 ## ✨ Features
 
-### 🔍 Compare
-Find the best prices across different stores instantly. Looking for 5kg rice? See that Store A has it for €12 while Store B offers it at €9 — all in one glance.
+### 📱 Mobile App
+| Feature | Description |
+|---------|-------------|
+| 🔍 **Price Comparison** | Compare prices across multiple stores in real-time |
+| 📦 **Reserve & Pay** | Reserve items and pay at pickup |
+| 📍 **Location Picker** | Set your location manually or use GPS |
+| 🛒 **Smart Cart** | Add items from different stores |
+| 📋 **Order History** | Track all your completed orders |
+| ⏰ **Reservations** | Manage active and past reservations |
+| 🤖 **ML Recommendations** | Get personalized product suggestions |
+| 🔐 **Secure Auth** | Email/password authentication |
+| ⚙️ **Settings** | Notifications, language, account management |
+| ❓ **Help & Support** | FAQ, email and phone support |
 
-### 📱 Reserve & Pay
-Found the best deal? Reserve it right from the app. Pay securely and the store will set your item aside — no more "sorry, we just sold out."
-
-### 📦 Collect
-Pick up your reserved items within 48 hours at your convenience. Skip the queues, grab your stuff, and go!
-
-### 🤖 Smart Recommendations
-Our ML-powered engine learns what you like. Get personalized suggestions based on your browsing and buying patterns.
+### 💻 Admin Panel
+| Feature | Description |
+|---------|-------------|
+| 📊 **Dashboard** | Overview of products, stores, users, orders |
+| 📦 **Product Management** | Add/edit products with images, prices, categories |
+| 🏪 **Store Management** | Add/edit stores with address autocomplete |
+| 📋 **Order Management** | View and manage reservations |
+| 👥 **User Management** | View registered users |
+| 📈 **ML Analytics** | Track user behavior and trends |
 
 ## 🔄 How It Works
 
 ```
 1. 🔍 SEARCH    →  Find products you need
 2. 📊 COMPARE   →  See prices across all partner stores  
-3. 💳 PAY       →  Secure in-app payment
-4. ⏰ RESERVE   →  Store holds your item for 48 hours
-5. 🚶 COLLECT   →  Pick up at your convenience
+3. 🛒 ADD       →  Add to cart from best-priced store
+4. ✅ CHECKOUT  →  Confirm your reservation
+5. ⏰ 48 HOURS  →  Pick up within 48 hours
+6. 🎉 COLLECT   →  Show reservation, pay, and go!
 ```
 
 > **Note:** If items aren't collected within 48 hours, a 10% restocking fee applies and the remainder is refunded.
 
-## 📱 Screenshots
-
-| Welcome Screen |
-|:--------------:|
-| ![Welcome](docs/screenshots/welcome.png) |
-
-*More screenshots coming soon as we build out the app!*
-
 ## 🛠 Tech Stack
 
-- **Language:** Java 11
-- **UI:** XML Layouts with Material Design 3
-- **Architecture:** Android Jetpack
-- **Min SDK:** 24 (Android 7.0)
-- **Target SDK:** 36
-- **Build System:** Gradle 9.1 with Version Catalog
+### Mobile App
+| Technology | Purpose |
+|------------|---------|
+| Java 11 | Primary language |
+| XML Layouts | UI design |
+| Material Design 3 | Modern UI components |
+| Firebase Auth | User authentication |
+| Cloud Firestore | Database |
+| Firebase Storage | Image storage |
+| Google Play Services | Location services |
+| Glide | Image loading |
+
+### Admin Panel
+| Technology | Purpose |
+|------------|---------|
+| HTML5/CSS3 | Structure & styling |
+| JavaScript | Logic |
+| Firebase SDK | Backend integration |
+| OpenStreetMap Nominatim | Address geocoding |
+
+### Build & Tools
+| Tool | Version |
+|------|---------|
+| Android Studio | Latest |
+| Gradle | 9.1.0 |
+| Min SDK | 24 (Android 7.0) |
+| Target SDK | 36 |
 
 ## 🚀 Getting Started
 
@@ -104,7 +126,22 @@ QLess/
 ├── app/
 │   ├── src/main/
 │   │   ├── java/com/example/qless/
-│   │   │   └── MainActivity.java
+│   │   │   ├── MainActivity.java       # Welcome screen
+│   │   │   ├── LoginActivity.java      # Login
+│   │   │   ├── SignupActivity.java     # Registration
+│   │   │   ├── HomeActivity.java       # Main home screen
+│   │   │   ├── SearchActivity.java     # Product search
+│   │   │   ├── ProductDetailActivity.java  # Product details
+│   │   │   ├── CartActivity.java       # Shopping cart
+│   │   │   ├── CheckoutActivity.java   # Checkout flow
+│   │   │   ├── OrdersActivity.java     # Order history
+│   │   │   ├── ReservationsActivity.java   # Reservations
+│   │   │   ├── ProfileActivity.java    # User profile
+│   │   │   ├── SettingsActivity.java   # App settings
+│   │   │   ├── HelpActivity.java       # Help & FAQ
+│   │   │   ├── LocationPickerActivity.java # Location selector
+│   │   │   ├── CartManager.java        # Cart singleton
+│   │   │   └── RecommendationEngine.java   # ML recommendations
 │   │   ├── res/
 │   │   │   ├── drawable/          # Icons & backgrounds
 │   │   │   ├── layout/            # XML layouts
@@ -112,22 +149,59 @@ QLess/
 │   │   │   └── values-night/      # Dark theme
 │   │   └── AndroidManifest.xml
 │   └── build.gradle
+├── admin/                         # Admin web panel
+│   ├── index.html
+│   ├── app.js
+│   └── style.css
 ├── gradle/
 │   └── libs.versions.toml         # Dependency versions
-└── build.gradle
+├── FIREBASE_SETUP.md              # Firebase setup guide
+├── FIRESTORE_RULES.md             # Firestore security rules
+└── AGENTS.md                      # Project documentation
 ```
 
-## 🗺 Roadmap
+## ✅ Completed Features
 
 - [x] Welcome screen with branding
-- [ ] User authentication (Login/Register)
-- [ ] Product browsing & search
-- [ ] Store listings with price comparison
-- [ ] Shopping cart & checkout
-- [ ] Order history & tracking
-- [ ] ML-powered recommendations
+- [x] User authentication (Email/Password)
+- [x] User registration with validation
+- [x] Password strength indicator
+- [x] Password reset via email
+- [x] Home screen with categories
+- [x] Product browsing & search
+- [x] Store listings with location
+- [x] Price comparison across stores
+- [x] Product detail view
+- [x] Shopping cart
+- [x] Checkout & reservation system
+- [x] Order history
+- [x] Reservations management (active/past)
+- [x] User profile
+- [x] Settings (notifications, language, etc.)
+- [x] Help & Support with FAQ
+- [x] Location picker (GPS + manual)
+- [x] ML-powered recommendations
+- [x] Admin panel (products, stores, orders, analytics)
+- [x] Responsive admin dashboard
+
+## 🚀 Future Enhancements
+
 - [ ] Push notifications
-- [ ] Store partner dashboard
+- [ ] In-app payments integration
+- [ ] QR code for pickup verification
+- [ ] Store partner mobile app
+- [ ] Loyalty/rewards program
+- [ ] Social sharing
+- [ ] Multi-language support
+- [ ] Dark mode
+
+## 💻 Admin Panel
+
+The admin panel is located in the `/admin` folder. To use it:
+
+1. Open `admin/index.html` in a web browser
+2. Login with your Firebase credentials
+3. Manage products, stores, orders, and view analytics
 
 ## 🤝 Contributing
 
