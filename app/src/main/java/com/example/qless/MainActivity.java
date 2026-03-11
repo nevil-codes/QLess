@@ -1,7 +1,8 @@
 package com.example.qless;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,8 +30,13 @@ public class MainActivity extends AppCompatActivity {
         // Setup Get Started button
         MaterialButton btnGetStarted = findViewById(R.id.btnGetStarted);
         btnGetStarted.setOnClickListener(v -> {
-            // TODO: Navigate to login/registration or main app screen
-            Toast.makeText(this, "Let's get started!", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MainActivity.this, SignupActivity.class));
+        });
+
+        // Setup Sign In link
+        TextView txtAlreadyMember = findViewById(R.id.txtAlreadyMember);
+        txtAlreadyMember.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
         });
     }
 }
