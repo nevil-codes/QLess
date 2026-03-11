@@ -2,4 +2,36 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- QLess Premium Brand Colors -->
+    <color name="primary">#6366F1</color>
+    <color name="primary_dark">#4F46E5</color>
+    <color name="primary_light">#818CF8</color>
+    <color name="secondary">#A855F7</color>
+    <color name="accent">#10B981</color>
+
+    <!-- Gradient Colors -->
+    <color name="gradient_start">#6366F1</color>
+    <color name="gradient_center">#8B5CF6</color>
+    <color name="gradient_end">#A855F7</color>
+
+    <!-- Background & Surface -->
+    <color name="background_light">#FAFBFF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F3F4F6</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#1F2937</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_light">#9CA3AF</color>
+    <color name="text_on_primary">#FFFFFF</color>
+
+    <!-- Feature Colors -->
+    <color name="feature_compare">#6366F1</color>
+    <color name="feature_reserve">#EC4899</color>
+    <color name="feature_collect">#10B981</color>
+
+    <!-- Glass/Overlay -->
+    <color name="glass_white">#20FFFFFF</color>
+    <color name="glass_white_strong">#40FFFFFF</color>
 </resources>

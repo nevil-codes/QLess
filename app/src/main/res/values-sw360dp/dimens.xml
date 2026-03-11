@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Larger dimensions for sw360dp screens -->
+    <dimen name="logo_size">100dp</dimen>
+    <dimen name="logo_padding">22dp</dimen>
+    <dimen name="logo_margin_top">64dp</dimen>
+    <dimen name="logo_elevation">12dp</dimen>
+
+    <dimen name="app_name_size">46sp</dimen>
+    <dimen name="app_name_margin_top">22dp</dimen>
+
+    <dimen name="motto_size">16sp</dimen>
+    <dimen name="motto_margin_top">10dp</dimen>
+
+    <dimen name="landing_image_height">220dp</dimen>
+    <dimen name="landing_image_margin_horizontal">36dp</dimen>
+    <dimen name="landing_image_margin_top">36dp</dimen>
+
+    <dimen name="feature_card_padding">14dp</dimen>
+    <dimen name="feature_card_margin">22dp</dimen>
+    <dimen name="feature_card_spacing">8dp</dimen>
+    <dimen name="feature_icon_size">44dp</dimen>
+    <dimen name="feature_title_size">13sp</dimen>
+    <dimen name="feature_desc_size">10sp</dimen>
+
+    <dimen name="description_size">15sp</dimen>
+    <dimen name="description_margin_horizontal">36dp</dimen>
+    <dimen name="description_margin_top">28dp</dimen>
+
+    <dimen name="button_height">54dp</dimen>
+    <dimen name="button_margin_horizontal">36dp</dimen>
+    <dimen name="button_margin_top">30dp</dimen>
+    <dimen name="button_margin_bottom">36dp</dimen>
+    <dimen name="button_corner_radius">27dp</dimen>
+    <dimen name="button_text_size">16sp</dimen>
+</resources>
+

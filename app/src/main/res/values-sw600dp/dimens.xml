@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tablet dimensions for sw600dp -->
+    <dimen name="logo_size">130dp</dimen>
+    <dimen name="logo_padding">28dp</dimen>
+    <dimen name="logo_margin_top">80dp</dimen>
+    <dimen name="logo_elevation">16dp</dimen>
+
+    <dimen name="app_name_size">64sp</dimen>
+    <dimen name="app_name_margin_top">28dp</dimen>
+
+    <dimen name="motto_size">20sp</dimen>
+    <dimen name="motto_margin_top">12dp</dimen>
+
+    <dimen name="landing_image_height">320dp</dimen>
+    <dimen name="landing_image_margin_horizontal">80dp</dimen>
+    <dimen name="landing_image_margin_top">48dp</dimen>
+
+    <dimen name="feature_card_padding">20dp</dimen>
+    <dimen name="feature_card_margin">48dp</dimen>
+    <dimen name="feature_card_spacing">16dp</dimen>
+    <dimen name="feature_icon_size">56dp</dimen>
+    <dimen name="feature_title_size">16sp</dimen>
+    <dimen name="feature_desc_size">13sp</dimen>
+
+    <dimen name="description_size">18sp</dimen>
+    <dimen name="description_margin_horizontal">80dp</dimen>
+    <dimen name="description_margin_top">40dp</dimen>
+
+    <dimen name="button_height">64dp</dimen>
+    <dimen name="button_margin_horizontal">120dp</dimen>
+    <dimen name="button_margin_top">40dp</dimen>
+    <dimen name="button_margin_bottom">48dp</dimen>
+    <dimen name="button_corner_radius">32dp</dimen>
+    <dimen name="button_text_size">18sp</dimen>
+</resources>
+

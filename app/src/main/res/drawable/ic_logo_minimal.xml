@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="80"
+    android:viewportHeight="80">
+
+    <!-- Q shape - outer ring -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,8C22.33,8 8,22.33 8,40C8,57.67 22.33,72 40,72C48.5,72 56.2,68.8 62,63.5L67,68.5C68.2,69.7 70.2,69.7 71.4,68.5C72.6,67.3 72.6,65.3 71.4,64.1L66.4,59.1C70.5,54 73,47.3 73,40C73,22.33 58.67,8 40,8ZM40,16C54.36,16 66,27.64 66,42C66,56.36 54.36,68 40,68C25.64,68 14,56.36 14,42C14,27.64 25.64,16 40,16Z" />
+
+    <!-- Shopping bag -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,36V33C30,27.48 34.48,23 40,23C45.52,23 50,27.48 50,33V36H52C53.66,36 55,37.34 55,39V56C55,57.66 53.66,59 52,59H28C26.34,59 25,57.66 25,56V39C25,37.34 26.34,36 28,36H30ZM35,36H45V33C45,30.24 42.76,28 40,28C37.24,28 35,30.24 35,33V36Z" />
+
+    <!-- Checkmark -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M37,48L39,50L45,44C46,43 47.5,43 48.5,44C49.5,45 49.5,46.5 48.5,47.5L41,55C40,56 38.5,56 37.5,55L33.5,51C32.5,50 32.5,48.5 33.5,47.5C34.5,46.5 36,46.5 37,48Z" />
+</vector>
+

@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">QLess</string>
+    <string name="app_motto">Compare. Reserve. Collect.</string>
+    <string name="app_description">Smart shopping made simple. Find the best prices, reserve items instantly, and pick up when it suits you.</string>
+    <string name="get_started">Get Started</string>
+    <string name="already_member">Already have an account? Sign In</string>
+
+    <!-- Feature Highlights -->
+    <string name="feature_compare">Compare</string>
+    <string name="feature_compare_desc">Best prices across stores</string>
+    <string name="feature_reserve">Reserve</string>
+    <string name="feature_reserve_desc">Pay &amp; hold your items</string>
+    <string name="feature_collect">Collect</string>
+    <string name="feature_collect_desc">Pick up within 48hrs</string>
 </resources>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="400dp"
+    android:height="800dp"
+    android:viewportWidth="400"
+    android:viewportHeight="800">
+
+    <!-- Background base -->
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M0,0h400v800h-400z" />
+
+    <!-- Large blob top-right -->
+    <path
+        android:fillColor="#818CF8"
+        android:pathData="M250,0 Q400,50 400,200 L400,0 Z" />
+
+    <!-- Wave pattern middle -->
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M0,350 Q100,300 200,350 T400,350 L400,500 Q300,450 200,500 T0,500 Z" />
+
+    <!-- Large blob bottom-left -->
+    <path
+        android:fillColor="#8B5CF6"
+        android:pathData="M0,550 Q50,500 150,550 Q200,600 150,700 Q100,800 0,800 Z" />
+
+    <!-- Accent blob bottom-right -->
+    <path
+        android:fillColor="#A855F7"
+        android:pathData="M300,650 Q400,600 400,750 L400,800 L250,800 Q280,750 300,650 Z" />
+
+    <!-- Subtle top-left accent -->
+    <path
+        android:fillColor="#4F46E5"
+        android:pathData="M0,0 L150,0 Q100,80 0,120 Z" />
+
+    <!-- Small floating circle 1 -->
+    <path
+        android:fillColor="#A5B4FC"
+        android:fillAlpha="0.3"
+        android:pathData="M320,150m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0" />
+
+    <!-- Small floating circle 2 -->
+    <path
+        android:fillColor="#C4B5FD"
+        android:fillAlpha="0.25"
+        android:pathData="M80,450m-30,0a30,30 0,1 1,60 0a30,30 0,1 1,-60 0" />
+
+    <!-- Small floating circle 3 -->
+    <path
+        android:fillColor="#DDD6FE"
+        android:fillAlpha="0.2"
+        android:pathData="M350,550m-25,0a25,25 0,1 1,50 0a25,25 0,1 1,-50 0" />
+</vector>

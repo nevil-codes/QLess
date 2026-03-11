@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Welcome Screen Dimensions -->
+    <dimen name="logo_size">96dp</dimen>
+    <dimen name="logo_padding">20dp</dimen>
+    <dimen name="logo_margin_top">56dp</dimen>
+    <dimen name="logo_elevation">12dp</dimen>
+
+    <dimen name="app_name_size">42sp</dimen>
+    <dimen name="app_name_margin_top">20dp</dimen>
+
+    <dimen name="motto_size">15sp</dimen>
+    <dimen name="motto_margin_top">8dp</dimen>
+
+    <dimen name="landing_image_height">200dp</dimen>
+    <dimen name="landing_image_margin_horizontal">32dp</dimen>
+    <dimen name="landing_image_margin_top">32dp</dimen>
+
+    <dimen name="feature_card_padding">12dp</dimen>
+    <dimen name="feature_card_margin">20dp</dimen>
+    <dimen name="feature_card_spacing">6dp</dimen>
+    <dimen name="feature_icon_size">40dp</dimen>
+    <dimen name="feature_title_size">12sp</dimen>
+    <dimen name="feature_desc_size">9sp</dimen>
+
+    <dimen name="description_size">14sp</dimen>
+    <dimen name="description_margin_horizontal">32dp</dimen>
+    <dimen name="description_margin_top">24dp</dimen>
+
+    <dimen name="button_height">52dp</dimen>
+    <dimen name="button_margin_horizontal">32dp</dimen>
+    <dimen name="button_margin_top">28dp</dimen>
+    <dimen name="button_margin_bottom">32dp</dimen>
+    <dimen name="button_corner_radius">26dp</dimen>
+    <dimen name="button_text_size">15sp</dimen>
+</resources>
+
