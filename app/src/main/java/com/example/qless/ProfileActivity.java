@@ -39,13 +39,13 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Menu items
         findViewById(R.id.menuOrders).setOnClickListener(v ->
-                Toast.makeText(this, "Orders coming soon!", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, OrdersActivity.class)));
         findViewById(R.id.menuReservations).setOnClickListener(v ->
-                Toast.makeText(this, "Reservations coming soon!", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, ReservationsActivity.class)));
         findViewById(R.id.menuSettings).setOnClickListener(v ->
-                Toast.makeText(this, "Settings coming soon!", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, SettingsActivity.class)));
         findViewById(R.id.menuHelp).setOnClickListener(v ->
-                Toast.makeText(this, "Help coming soon!", Toast.LENGTH_SHORT).show());
+                startActivity(new Intent(this, HelpActivity.class)));
 
         // Logout
         findViewById(R.id.btnLogout).setOnClickListener(v -> showLogoutDialog());

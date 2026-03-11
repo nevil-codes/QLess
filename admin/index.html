@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QLess Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-card">
+        <div class="login-logo"><i class="fas fa-shopping-bag"></i><h1>QLess Admin</h1><p>Dashboard Login</p></div>
+        <div class="form-group"><label>Email</label><input type="email" id="loginEmail" placeholder="admin@qless.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+        <button class="btn btn-primary btn-full" onclick="adminLogin()">Sign In</button>
+        <p id="loginError" class="error-text"></p>
+    </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard" class="dashboard" style="display:none">
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><i class="fas fa-shopping-bag"></i><span>QLess Admin</span></div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" onclick="showPage('overview'); toggleSidebar();"><i class="fas fa-chart-line"></i><span>Overview</span></a>
+            <a href="#" class="nav-item" onclick="showPage('products'); toggleSidebar();"><i class="fas fa-box"></i><span>Products</span></a>
+            <a href="#" class="nav-item" onclick="showPage('stores'); toggleSidebar();"><i class="fas fa-store"></i><span>Stores</span></a>
+            <a href="#" class="nav-item" onclick="showPage('orders'); toggleSidebar();"><i class="fas fa-receipt"></i><span>Orders</span></a>
+            <a href="#" class="nav-item" onclick="showPage('users'); toggleSidebar();"><i class="fas fa-users"></i><span>Users</span></a>
+            <a href="#" class="nav-item" onclick="showPage('analytics'); toggleSidebar();"><i class="fas fa-brain"></i><span>ML Analytics</span></a>
+        </nav>
+        <div class="sidebar-footer"><button class="btn btn-outline btn-full" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Log Out</button></div>
+    </aside>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <button class="mobile-menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <h2 id="pageTitle">Overview</h2>
+            <span id="adminEmail" class="admin-email"></span>
+        </header>
+
+        <!-- OVERVIEW -->
+        <div id="page-overview" class="page active">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-icon si-purple"><i class="fas fa-box"></i></div><div class="stat-info"><span class="stat-number" id="statProducts">0</span><span class="stat-label">Products</span></div></div>
+                <div class="stat-card"><div class="stat-icon si-yellow"><i class="fas fa-store"></i></div><div class="stat-info"><span class="stat-number" id="statStores">0</span><span class="stat-label">Stores</span></div></div>
+                <div class="stat-card"><div class="stat-icon si-green"><i class="fas fa-users"></i></div><div class="stat-info"><span class="stat-number" id="statUsers">0</span><span class="stat-label">Users</span></div></div>
+                <div class="stat-card"><div class="stat-icon si-red"><i class="fas fa-receipt"></i></div><div class="stat-info"><span class="stat-number" id="statOrders">0</span><span class="stat-label">Orders</span></div></div>
+            </div>
+            <div class="card"><h3>Recent User Events (ML Data)</h3><table class="table" id="recentEventsTable"><thead><tr><th>User</th><th>Event</th><th>Product</th><th>Category</th><th>Time</th></tr></thead><tbody></tbody></table></div>
+        </div>
+
+        <!-- PRODUCTS -->
+        <div id="page-products" class="page">
+            <div class="page-header"><h3>All Products</h3><button class="btn btn-primary" onclick="openProductModal()"><i class="fas fa-plus"></i> Add Product</button></div>
+            <div class="category-slider-container">
+                <button class="slider-arrow slider-arrow-left" onclick="scrollCategorySlider(-1)"><i class="fas fa-chevron-left"></i></button>
+                <div class="category-slider" id="categorySlider">
+                    <div class="category-chip active" data-category="all" onclick="filterByCategory('all')">
+                        <i class="fas fa-th-large"></i>
+                        <span>All</span>
+                    </div>
+                    <div class="category-chip" data-category="Groceries" onclick="filterByCategory('Groceries')">
+                        <i class="fas fa-shopping-basket"></i>
+                        <span>Groceries</span>
+                    </div>
+                    <div class="category-chip" data-category="Electronics" onclick="filterByCategory('Electronics')">
+                        <i class="fas fa-laptop"></i>
+                        <span>Electronics</span>
+                    </div>
+                    <div class="category-chip" data-category="Tobacco" onclick="filterByCategory('Tobacco')">
+                        <i class="fas fa-smoking"></i>
+                        <span>Tobacco</span>
+                    </div>
+                    <div class="category-chip" data-category="Beverages" onclick="filterByCategory('Beverages')">
+                        <i class="fas fa-glass-water"></i>
+                        <span>Beverages</span>
+                    </div>
+                    <div class="category-chip" data-category="Snacks" onclick="filterByCategory('Snacks')">
+                        <i class="fas fa-cookie"></i>
+                        <span>Snacks</span>
+                    </div>
+                    <div class="category-chip" data-category="Dairy" onclick="filterByCategory('Dairy')">
+                        <i class="fas fa-cheese"></i>
+                        <span>Dairy</span>
+                    </div>
+                    <div class="category-chip" data-category="Health" onclick="filterByCategory('Health')">
+                        <i class="fas fa-heart-pulse"></i>
+                        <span>Health</span>
+                    </div>
+                    <div class="category-chip" data-category="Personal Care" onclick="filterByCategory('Personal Care')">
+                        <i class="fas fa-pump-soap"></i>
+                        <span>Personal Care</span>
+                    </div>
+                    <div class="category-chip" data-category="Household" onclick="filterByCategory('Household')">
+                        <i class="fas fa-house"></i>
+                        <span>Household</span>
+                    </div>
+                    <div class="category-chip" data-category="Clothing" onclick="filterByCategory('Clothing')">
+                        <i class="fas fa-shirt"></i>
+                        <span>Clothing</span>
+                    </div>
+                    <div class="category-chip" data-category="Sports" onclick="filterByCategory('Sports')">
+                        <i class="fas fa-futbol"></i>
+                        <span>Sports</span>
+                    </div>
+                    <div class="category-chip" data-category="Baby" onclick="filterByCategory('Baby')">
+                        <i class="fas fa-baby"></i>
+                        <span>Baby</span>
+                    </div>
+                    <div class="category-chip" data-category="Pets" onclick="filterByCategory('Pets')">
+                        <i class="fas fa-paw"></i>
+                        <span>Pets</span>
+                    </div>
+                    <div class="category-chip" data-category="Bakery" onclick="filterByCategory('Bakery')">
+                        <i class="fas fa-bread-slice"></i>
+                        <span>Bakery</span>
+                    </div>
+                    <div class="category-chip" data-category="Frozen" onclick="filterByCategory('Frozen')">
+                        <i class="fas fa-snowflake"></i>
+                        <span>Frozen</span>
+                    </div>
+                    <div class="category-chip" data-category="Home" onclick="filterByCategory('Home')">
+                        <i class="fas fa-couch"></i>
+                        <span>Home</span>
+                    </div>
+                </div>
+                <button class="slider-arrow slider-arrow-right" onclick="scrollCategorySlider(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="card"><table class="table" id="productsTable"><thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Brand</th><th>Stores</th><th>Best Price</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </div>
+
+        <!-- STORES -->
+        <div id="page-stores" class="page">
+            <div class="page-header"><h3>All Stores</h3><button class="btn btn-primary" onclick="openStoreModal()"><i class="fas fa-plus"></i> Add Store</button></div>
+            <div class="card"><table class="table" id="storesTable"><thead><tr><th>Name</th><th>Category</th><th>Phone</th><th>Rating</th><th>Location</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </div>
+
+        <!-- ORDERS -->
+        <div id="page-orders" class="page">
+            <div class="page-header"><h3>Orders &amp; Reservations</h3></div>
+            <div class="card"><table class="table" id="ordersTable"><thead><tr><th>ID</th><th>User</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        </div>
+
+        <!-- USERS -->
+        <div id="page-users" class="page">
+            <div class="page-header"><h3>Registered Users</h3></div>
+            <div class="card"><table class="table" id="usersTable"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th></tr></thead><tbody></tbody></table></div>
+        </div>
+
+        <!-- ML ANALYTICS -->
+        <div id="page-analytics" class="page">
+            <div class="page-header"><h3>ML Analytics &amp; User Behavior</h3></div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-icon si-purple"><i class="fas fa-eye"></i></div><div class="stat-info"><span class="stat-number" id="statViews">0</span><span class="stat-label">Views</span></div></div>
+                <div class="stat-card"><div class="stat-icon si-green"><i class="fas fa-cart-plus"></i></div><div class="stat-info"><span class="stat-number" id="statCartAdds">0</span><span class="stat-label">Cart Adds</span></div></div>
+                <div class="stat-card"><div class="stat-icon si-yellow"><i class="fas fa-search"></i></div><div class="stat-info"><span class="stat-number" id="statSearches">0</span><span class="stat-label">Searches</span></div></div>
+                <div class="stat-card"><div class="stat-icon si-red"><i class="fas fa-shopping-bag"></i></div><div class="stat-info"><span class="stat-number" id="statPurchases">0</span><span class="stat-label">Purchases</span></div></div>
+            </div>
+            <div class="two-col">
+                <div class="card"><h3>Top Categories</h3><div id="topCategories" class="bar-chart"></div></div>
+                <div class="card"><h3>Top Brands</h3><div id="topBrands" class="bar-chart"></div></div>
+            </div>
+            <div class="card"><h3>Top Searches</h3><div id="topSearches" class="tag-cloud"></div></div>
+        </div>
+    </main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div id="productModal" class="modal" style="display:none">
+    <div class="modal-content modal-lg">
+        <div class="modal-header"><h3 id="productModalTitle">Add Product</h3><button class="btn-close" onclick="closeProductModal()">&times;</button></div>
+        <div class="modal-body">
+            <input type="hidden" id="productId">
+            <div class="form-row">
+                <div class="form-group product-name-autocomplete">
+                    <label>Product Name *</label>
+                    <input type="text" id="prodName" autocomplete="off" placeholder="Start typing product name...">
+                    <div id="productNameDropdown" class="product-name-dropdown"></div>
+                </div>
+                <div class="form-group"><label>Brand</label><input type="text" id="prodBrand"></div>
+            </div>
+            <div class="form-row"><div class="form-group"><label>Category *</label><select id="prodCategory"><option value="">Select</option><option>Groceries</option><option>Electronics</option><option>Clothing</option><option>Home</option><option>Health</option><option>Sports</option><option>Tobacco</option><option>Beverages</option><option>Snacks</option><option>Dairy</option><option>Bakery</option><option>Frozen</option><option>Personal Care</option><option>Baby</option><option>Pets</option><option>Household</option></select></div><div class="form-group"><label>SKU</label><input type="text" id="prodSku"></div></div>
+            <div class="form-group"><label>Description</label><textarea id="prodDescription" rows="3"></textarea></div>
+            <div class="form-group">
+                <label>Product Image</label>
+                <div class="image-upload-container">
+                    <input type="file" id="prodImageFile" accept="image/*" onchange="handleImageSelect(this)">
+                    <label for="prodImageFile" class="image-upload-btn"><i class="fas fa-cloud-upload-alt"></i> Choose Image</label>
+                    <span id="imageFileName" class="image-file-name"></span>
+                </div>
+                <input type="hidden" id="prodImageUrl">
+            </div>
+            <div id="imagePreview" class="image-preview"></div>
+            <div id="imageUploadProgress" class="upload-progress" style="display:none"><div class="progress-bar"><div class="progress-fill" id="uploadProgressFill"></div></div><span id="uploadProgressText">Uploading...</span></div>
+            <div class="form-row"><div class="form-group"><label>Rating</label><input type="number" id="prodRating" step="0.1" min="0" max="5"></div><div class="form-group"><label>Reviews</label><input type="number" id="prodReviews"></div></div>
+            <h4 style="margin-top:20px">Store Prices <button class="btn btn-sm" onclick="addPriceRow()"><i class="fas fa-plus"></i> Add Store</button></h4>
+            <div id="priceRows"></div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline" onclick="closeProductModal()">Cancel</button><button class="btn btn-primary" onclick="saveProduct()">Save Product</button></div>
+    </div>
+</div>
+
+<!-- STORE MODAL -->
+<div id="storeModal" class="modal" style="display:none">
+    <div class="modal-content">
+        <div class="modal-header"><h3 id="storeModalTitle">Add Store</h3><button class="btn-close" onclick="closeStoreModal()">&times;</button></div>
+        <div class="modal-body">
+            <input type="hidden" id="storeId">
+            <input type="hidden" id="storeLat">
+            <input type="hidden" id="storeLng">
+            <div class="form-group"><label>Store Name *</label><input type="text" id="storeName"></div>
+            <div class="form-row"><div class="form-group"><label>Category</label><input type="text" id="storeCategory"></div><div class="form-group"><label>Phone</label><input type="text" id="storePhone"></div></div>
+            <div class="form-row"><div class="form-group"><label>Rating</label><input type="number" id="storeRating" step="0.1" min="0" max="5"></div><div class="form-group"><label>Reviews</label><input type="number" id="storeReviews"></div></div>
+            <div class="form-group address-autocomplete">
+                <label>Address *</label>
+                <input type="text" id="storeAddress" placeholder="Start typing an address..." autocomplete="off">
+                <div id="addressDropdown" class="address-dropdown"></div>
+            </div>
+        </div>
+        <div class="modal-footer"><button class="btn btn-outline" onclick="closeStoreModal()">Cancel</button><button class="btn btn-primary" onclick="saveStore()">Save Store</button></div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

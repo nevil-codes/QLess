@@ -56,6 +56,31 @@
             android:name=".ProductDetailActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".CheckoutActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".OrdersActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ReservationsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".HelpActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".LocationPickerActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

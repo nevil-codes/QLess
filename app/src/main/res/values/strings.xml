@@ -51,6 +51,8 @@
     <string name="signup_success">Account created successfully!</string>
     <string name="login_success">Welcome back!</string>
     <string name="auth_error">Authentication failed. Please try again.</string>
+    <string name="password_reset_sent">Password reset email sent!</string>
+    <string name="password_reset_failed">Failed to send reset email</string>
 
     <!-- Home Screen -->
     <string name="hi_user">Hi, %1$s!</string>
@@ -70,6 +72,14 @@
     <string name="all_prices">All Prices</string>
     <string name="in_stock">In Stock</string>
     <string name="out_of_stock">Out of Stock</string>
+
+    <!-- Location Picker -->
+    <string name="set_location">Set Location</string>
+    <string name="search_location_hint">Search for a city or address…</string>
+    <string name="use_current_location">Use Current Location</string>
+    <string name="saved_locations">Saved Locations</string>
+    <string name="search_results">Search Results</string>
+    <string name="location_updated">Location updated</string>
 
     <!-- Categories -->
     <string name="cat_groceries">Groceries</string>
@@ -120,4 +130,71 @@
     <string name="similar_products">Similar Products</string>
     <string name="people_also_buy">People Also Buy</string>
     <string name="recommended_for_you">Recommended For You</string>
+
+    <!-- Checkout -->
+    <string name="order_summary">Order Summary</string>
+    <string name="service_fee">Service Fee</string>
+    <string name="pickup_location">Pickup Location</string>
+    <string name="pickup_time">Pickup Time</string>
+    <string name="pickup_time_notice">Items must be picked up within 48 hours</string>
+    <string name="late_pickup_fee">10% fee if not picked up on time</string>
+    <string name="payment_notice">You will pay at the store when you pick up your items. A 10% fee applies if items are not collected within 48 hours.</string>
+    <string name="confirm_reservation">Confirm Reservation</string>
+    <string name="reservation_success">Reservation confirmed! Pick up your items within 48 hours.</string>
+    <string name="reservation_failed">Failed to create reservation. Please try again.</string>
+
+    <!-- Orders -->
+    <string name="no_orders_yet">No Orders Yet</string>
+    <string name="no_orders_desc">Your completed orders will appear here</string>
+    <string name="start_shopping">Start Shopping</string>
+    <string name="order_completed">Completed</string>
+    <string name="order_cancelled">Cancelled</string>
+    <string name="order_pending">Pending</string>
+
+    <!-- Reservations -->
+    <string name="no_reservations">No Reservations</string>
+    <string name="no_reservations_desc">Reserve items and pick them up at your convenience</string>
+    <string name="active_reservations">Active</string>
+    <string name="past_reservations">Past</string>
+    <string name="status_reserved">Reserved</string>
+    <string name="status_picked_up">Picked Up</string>
+    <string name="status_expired">Expired</string>
+    <string name="amount_paid">Amount Paid</string>
+    <string name="view_details">View Details</string>
+
+    <!-- Settings -->
+    <string name="account">Account</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_password">Change Password</string>
+    <string name="preferences">Preferences</string>
+    <string name="push_notifications">Push Notifications</string>
+    <string name="email_notifications">Email Notifications</string>
+    <string name="language">Language</string>
+    <string name="about">About</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="app_version">App Version</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_confirm">Are you sure you want to delete your account? This action cannot be undone.</string>
+    <string name="profile_updated">Profile updated successfully</string>
+    <string name="password_changed">Password changed successfully</string>
+
+    <!-- Help & Support -->
+    <string name="contact_us">Contact Us</string>
+    <string name="email_support">Email Support</string>
+    <string name="phone_support">Phone Support</string>
+    <string name="faq">Frequently Asked Questions</string>
+    <string name="follow_us">Follow Us</string>
+    <string name="faq_question_1">How does QLess work?</string>
+    <string name="faq_answer_1">QLess lets you compare prices across stores, reserve items, and pick them up at your convenience. Simply browse products, add to cart, and confirm your reservation. You have 48 hours to collect your items.</string>
+    <string name="faq_question_2">What happens if I don\'t pick up my items?</string>
+    <string name="faq_answer_2">If you don\'t collect your reserved items within 48 hours, a 10% fee will be charged. The remaining amount will be refunded to your original payment method.</string>
+    <string name="faq_question_3">Can I cancel my reservation?</string>
+    <string name="faq_answer_3">Yes, you can cancel your reservation anytime before pickup. Full refunds are provided for cancellations made within 24 hours of the reservation.</string>
+    <string name="faq_question_4">How do I pay for my items?</string>
+    <string name="faq_answer_4">Payment is made at the store when you pick up your items. Show your reservation code to the store staff and pay using cash, card, or mobile payment.</string>
+
+    <!-- Colors for Status -->
+    <string name="warning">Warning</string>
+    <string name="error">Error</string>
 </resources>

@@ -149,8 +149,8 @@ public class SignupActivity extends AppCompatActivity {
         // Sign Up button
         btnSignUp.setOnClickListener(v -> attemptSignUp());
 
-        // Google Sign Up
-        btnGoogleSignUp.setOnClickListener(v -> signUpWithGoogle());
+        // Google Sign Up - hide since not implemented
+        btnGoogleSignUp.setVisibility(View.GONE);
     }
 
     private boolean validateEmail() {
@@ -408,15 +408,9 @@ public class SignupActivity extends AppCompatActivity {
                 });
     }
 
-    private void signUpWithGoogle() {
-        // Google Sign-In implementation
-        Toast.makeText(this, "Google Sign-In coming soon!", Toast.LENGTH_SHORT).show();
-    }
-
     private void showLoading(boolean show) {
         loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         btnSignUp.setEnabled(!show);
-        btnGoogleSignUp.setEnabled(!show);
     }
 }
 

@@ -45,8 +45,11 @@ public class CartActivity extends AppCompatActivity {
             finish();
         });
 
-        findViewById(R.id.btnCheckout).setOnClickListener(v ->
-                Toast.makeText(this, "Checkout coming soon!", Toast.LENGTH_SHORT).show());
+        findViewById(R.id.btnCheckout).setOnClickListener(v -> {
+            if (!CartManager.getInstance().getItems().isEmpty()) {
+                startActivity(new Intent(this, CheckoutActivity.class));
+            }
+        });
 
         rvCart.setLayoutManager(new LinearLayoutManager(this));
         refreshCart();

@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Forgot Password
         txtForgotPassword.setOnClickListener(v -> {
-            String email = etEmail.getText().toString().trim();
+            String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
             if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 tilEmail.setError(getString(R.string.error_invalid_email));
                 return;
@@ -68,14 +68,14 @@ public class LoginActivity extends AppCompatActivity {
         // Login button
         btnLogin.setOnClickListener(v -> attemptLogin());
 
-        // Google Login
-        btnGoogleLogin.setOnClickListener(v -> loginWithGoogle());
+        // Google Login - hide or disable since not implemented
+        btnGoogleLogin.setVisibility(View.GONE);
     }
 
     private boolean validateForm() {
         boolean isValid = true;
 
-        String email = etEmail.getText().toString().trim();
+        String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
         if (email.isEmpty()) {
             tilEmail.setError(getString(R.string.error_field_required));
             isValid = false;
@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
             tilEmail.setError(null);
         }
 
-        String password = etPassword.getText().toString();
+        String password = etPassword.getText() != null ? etPassword.getText().toString() : "";
         if (password.isEmpty()) {
             tilPassword.setError(getString(R.string.error_field_required));
             isValid = false;
@@ -102,8 +102,8 @@ public class LoginActivity extends AppCompatActivity {
 
         showLoading(true);
 
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString();
+        String email = etEmail.getText() != null ? etEmail.getText().toString().trim() : "";
+        String password = etPassword.getText() != null ? etPassword.getText().toString() : "";
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
@@ -127,21 +127,16 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     showLoading(false);
                     if (task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Password reset email sent!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, R.string.password_reset_sent, Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(LoginActivity.this, "Failed to send reset email", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, R.string.password_reset_failed, Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
-
-    private void loginWithGoogle() {
-        Toast.makeText(this, "Google Sign-In coming soon!", Toast.LENGTH_SHORT).show();
     }
 
     private void showLoading(boolean show) {
         loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
         btnLogin.setEnabled(!show);
-        btnGoogleLogin.setEnabled(!show);
     }
 }
 

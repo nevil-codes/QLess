@@ -46,27 +46,96 @@
 4. Select your preferred region
 5. Click **"Enable"**
 
-## Step 6: Firestore Security Rules (for Production)
+## Step 6: Firestore Security Rules
 
-Replace test rules with:
+Go to **Firebase Console > Firestore Database > Rules** and replace with:
+
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // Users collection - users can only access their own data
     match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Products collection - anyone can read, authenticated users can write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Stores collection - anyone can read, authenticated users can write
+    match /stores/{storeId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Orders collection - authenticated users can read/write
+    match /orders/{orderId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Reservations collection - users can access their own reservations
+    match /reservations/{reservationId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // User events for ML - authenticated users can write
+    match /user_events/{eventId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
     }
   }
 }
 ```
 
-## Step 7: Google Sign-In Setup (Optional)
+**Important:** After updating rules, click **Publish** to apply them.
 
-1. Copy your **Web Client ID** from Firebase Console:
-   - Go to Authentication > Sign-in method > Google
-   - Copy the Web client ID
+## Step 7: Google Sign-In Setup (Required)
 
-2. Update `SignupActivity.java` and `LoginActivity.java` with the client ID
+### 7.1 Enable Google Sign-In in Firebase
+1. Go to **Firebase Console > Authentication > Sign-in method**
+2. Click **Google** provider
+3. Toggle **Enable**
+4. Enter your **Project support email**
+5. Click **Save**
+
+### 7.2 Add SHA-1 Certificate Fingerprint
+1. Generate SHA-1 fingerprint:
+   ```bash
+   cd /Users/nick/AndroidStudioProjects/QLess
+   ./gradlew signingReport
+   ```
+2. Copy the **SHA1** value from the debug variant
+3. Go to **Firebase Console > Project Settings > Your apps**
+4. Click **Add fingerprint** and paste the SHA-1
+
+### 7.3 Download Updated google-services.json
+1. After adding SHA-1, download the **updated** `google-services.json`
+2. Replace the file at `app/google-services.json`
+3. The file should now contain `oauth_client` entries
+
+### 7.4 Get Web Client ID
+1. Go to **Firebase Console > Authentication > Sign-in method > Google**
+2. Expand Google and copy the **Web client ID** (looks like: `xxxxx.apps.googleusercontent.com`)
+3. Open `app/src/main/res/values/strings.xml`
+4. Replace the placeholder:
+   ```xml
+   <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_HERE</string>
+   ```
+   With your actual Web Client ID:
+   ```xml
+   <string name="default_web_client_id">123456789-abcdefg.apps.googleusercontent.com</string>
+   ```
+
+### 7.5 Verify OAuth Consent Screen
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Select your Firebase project
+3. Go to **APIs & Services > OAuth consent screen**
+4. Ensure the app is configured (even in Testing mode)
+5. Add test users if in Testing mode
 
 ## Data Structure
 

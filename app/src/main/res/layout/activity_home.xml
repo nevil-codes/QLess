@@ -49,26 +49,38 @@
                         tools:text="Hi, John!" />
 
                     <LinearLayout
+                        android:id="@+id/locationRow"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
+                        android:background="?attr/selectableItemBackground"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
 
                         <ImageView
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:contentDescription="@null"
-                            android:src="@drawable/ic_location" />
+                            android:src="@drawable/ic_location"
+                            app:tint="@color/primary" />
 
                         <TextView
                             android:id="@+id/txtLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="4dp"
-                            android:textColor="@color/text_secondary"
+                            android:textColor="@color/primary"
                             android:textSize="13sp"
                             tools:text="Kray, Nordrhein-Westfalen" />
+
+                        <ImageView
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginStart="4dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_chevron_right"
+                            app:tint="@color/primary" />
                     </LinearLayout>
                 </LinearLayout>
 

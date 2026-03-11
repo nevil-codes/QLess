@@ -6,8 +6,12 @@
     android:background="@drawable/bg_category_chip"
     android:gravity="center"
     android:orientation="horizontal"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="10dp">
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingHorizontal="18dp"
+    android:paddingVertical="12dp"
+    android:elevation="2dp">
 
     <TextView
         android:id="@+id/txtEmoji"
@@ -19,9 +23,9 @@
         android:id="@+id/txtLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
+        android:layout_marginStart="8dp"
         android:fontFamily="sans-serif-medium"
         android:textColor="@color/primary"
-        android:textSize="13sp" />
+        android:textSize="14sp" />
 </LinearLayout>
 

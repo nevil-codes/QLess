@@ -40,4 +40,10 @@
     <color name="strength_fair">#F59E0B</color>
     <color name="strength_good">#84CC16</color>
     <color name="strength_strong">#10B981</color>
+
+    <!-- Status Colors -->
+    <color name="warning">#D97706</color>
+    <color name="warning_dark">#92400E</color>
+    <color name="error">#DC2626</color>
+    <color name="success">#059669</color>
 </resources>

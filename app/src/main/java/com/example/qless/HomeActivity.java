@@ -40,6 +40,7 @@ import java.util.Map;
 public class HomeActivity extends AppCompatActivity {
 
     private static final int LOCATION_PERMISSION_CODE = 1001;
+    private static final int LOCATION_PICKER_REQUEST = 1002;
 
     private TextView txtGreeting, txtLocation;
     private RecyclerView rvDeals, rvStores, rvRecommended;
@@ -51,14 +52,27 @@ public class HomeActivity extends AppCompatActivity {
     private RecommendationEngine recEngine;
 
     private double userLat = 0, userLng = 0;
+    private String selectedCategory = "All";
+    private List<Map<String, Object>> allProducts = new ArrayList<>();
 
     private final String[][] categories = {
+            {"🏷️", "All"},
             {"🥦", "Groceries"},
             {"📱", "Electronics"},
-            {"👕", "Clothing"},
-            {"🏠", "Home"},
+            {"🚬", "Tobacco"},
+            {"🥤", "Beverages"},
+            {"🍪", "Snacks"},
+            {"🧀", "Dairy"},
             {"💊", "Health"},
-            {"⚽", "Sports"}
+            {"🧴", "Personal Care"},
+            {"🏠", "Household"},
+            {"👕", "Clothing"},
+            {"⚽", "Sports"},
+            {"👶", "Baby"},
+            {"🐾", "Pets"},
+            {"🥖", "Bakery"},
+            {"❄️", "Frozen"},
+            {"🛋️", "Home"}
     };
 
     @Override
@@ -92,6 +106,9 @@ public class HomeActivity extends AppCompatActivity {
         rvRecommended.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         txtLocation.setText(getString(R.string.detecting_location));
+
+        // Location click → LocationPickerActivity
+        findViewById(R.id.locationRow).setOnClickListener(v -> openLocationPicker());
 
         // Search bar → SearchActivity
         findViewById(R.id.searchBar).setOnClickListener(v ->
@@ -144,13 +161,47 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setupCategories() {
         categoriesContainer.removeAllViews();
-        for (String[] cat : categories) {
+        for (int i = 0; i < categories.length; i++) {
+            String[] cat = categories[i];
             View chip = LayoutInflater.from(this).inflate(R.layout.item_category, categoriesContainer, false);
             TextView emoji = chip.findViewById(R.id.txtEmoji);
             TextView label = chip.findViewById(R.id.txtLabel);
             emoji.setText(cat[0]);
             label.setText(cat[1]);
+            
+            // Set initial selection state
+            if (cat[1].equals(selectedCategory)) {
+                chip.setBackgroundResource(R.drawable.bg_category_chip_selected);
+                label.setTextColor(getResources().getColor(R.color.white, null));
+            } else {
+                chip.setBackgroundResource(R.drawable.bg_category_chip);
+                label.setTextColor(getResources().getColor(R.color.primary, null));
+            }
+            
+            // Click listener
+            final String category = cat[1];
+            chip.setOnClickListener(v -> {
+                selectedCategory = category;
+                setupCategories(); // Refresh to update selection state
+                filterProductsByCategory(category);
+            });
+            
             categoriesContainer.addView(chip);
+        }
+    }
+    
+    private void filterProductsByCategory(String category) {
+        if (category.equals("All")) {
+            rvDeals.setAdapter(new DealsAdapter(allProducts));
+        } else {
+            List<Map<String, Object>> filtered = new ArrayList<>();
+            for (Map<String, Object> product : allProducts) {
+                String prodCategory = (String) product.get("category");
+                if (prodCategory != null && prodCategory.equalsIgnoreCase(category)) {
+                    filtered.add(product);
+                }
+            }
+            rvDeals.setAdapter(new DealsAdapter(filtered));
         }
     }
 
@@ -161,6 +212,36 @@ public class HomeActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_CODE);
         } else {
             getCurrentLocation();
+        }
+    }
+
+    private void openLocationPicker() {
+        Intent intent = new Intent(this, LocationPickerActivity.class);
+        startActivityForResult(intent, LOCATION_PICKER_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LOCATION_PICKER_REQUEST && resultCode == RESULT_OK && data != null) {
+            String locationName = data.getStringExtra(LocationPickerActivity.EXTRA_LOCATION_NAME);
+            String locationAddress = data.getStringExtra(LocationPickerActivity.EXTRA_LOCATION_ADDRESS);
+            double lat = data.getDoubleExtra(LocationPickerActivity.EXTRA_LATITUDE, 0);
+            double lng = data.getDoubleExtra(LocationPickerActivity.EXTRA_LONGITUDE, 0);
+
+            // Update location
+            userLat = lat;
+            userLng = lng;
+            
+            // Display location
+            if (locationAddress != null && !locationAddress.isEmpty()) {
+                txtLocation.setText(locationAddress);
+            } else if (locationName != null) {
+                txtLocation.setText(locationName);
+            }
+
+            // Reload stores with new location
+            loadStores();
         }
     }
 
@@ -241,13 +322,14 @@ public class HomeActivity extends AppCompatActivity {
     private void loadDeals() {
         db.collection("products").get()
                 .addOnSuccessListener(querySnapshot -> {
-                    List<Map<String, Object>> dealsList = new ArrayList<>();
+                    allProducts.clear();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
                         Map<String, Object> product = doc.getData();
                         product.put("id", doc.getId());
-                        dealsList.add(product);
+                        allProducts.add(product);
                     }
-                    rvDeals.setAdapter(new DealsAdapter(dealsList));
+                    // Apply current category filter
+                    filterProductsByCategory(selectedCategory);
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this, "Failed to load deals", Toast.LENGTH_SHORT).show());
