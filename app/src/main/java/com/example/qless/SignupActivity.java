@@ -397,8 +397,8 @@ public class SignupActivity extends AppCompatActivity {
                 .addOnSuccessListener(aVoid -> {
                     showLoading(false);
                     Toast.makeText(SignupActivity.this, getString(R.string.signup_success), Toast.LENGTH_SHORT).show();
-                    // Navigate to main app
-                    Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+                    // Navigate to home
+                    Intent intent = new Intent(SignupActivity.this, HomeActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 })

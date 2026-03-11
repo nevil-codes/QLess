@@ -51,4 +51,37 @@
     <string name="signup_success">Account created successfully!</string>
     <string name="login_success">Welcome back!</string>
     <string name="auth_error">Authentication failed. Please try again.</string>
+
+    <!-- Home Screen -->
+    <string name="hi_user">Hi, %1$s!</string>
+    <string name="detecting_location">Detecting location…</string>
+    <string name="search_products">Search products…</string>
+    <string name="categories">Categories</string>
+    <string name="best_deals">Best Deals Near You</string>
+    <string name="nearby_stores">Stores Near You</string>
+    <string name="see_all">See All</string>
+    <string name="open_now">Open Now</string>
+    <string name="closed">Closed</string>
+    <string name="km_away">%1$.1f km</string>
+    <string name="price_format">€%1$.2f</string>
+    <string name="discount_format">%1$d%% OFF</string>
+    <string name="location_permission_needed">Location permission needed to show nearby stores</string>
+    <string name="no_location">Location unavailable</string>
+    <string name="all_prices">All Prices</string>
+    <string name="in_stock">In Stock</string>
+    <string name="out_of_stock">Out of Stock</string>
+
+    <!-- Categories -->
+    <string name="cat_groceries">Groceries</string>
+    <string name="cat_electronics">Electronics</string>
+    <string name="cat_clothing">Clothing</string>
+    <string name="cat_home">Home</string>
+    <string name="cat_health">Health</string>
+    <string name="cat_sports">Sports</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_cart">Cart</string>
+    <string name="nav_profile">Profile</string>
 </resources>

@@ -47,6 +47,13 @@ dependencies {
     implementation libs.credentials.play.services.auth
     implementation libs.googleid
     
+    // Location
+    implementation libs.play.services.location
+    
+    // UI
+    implementation libs.recyclerview
+    implementation libs.cardview
+    
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
