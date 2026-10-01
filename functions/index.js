@@ -9,3 +9,4 @@ setGlobalOptions({ region: "europe-west1", maxInstances: 10 });
 const triggers = require("./recs/triggers");
 
 exports.onUserEventCreated = triggers.onUserEventCreated;
+exports.onReservationUpdated = triggers.onReservationUpdated;
