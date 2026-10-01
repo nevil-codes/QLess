@@ -17,13 +17,26 @@ function adminLogin() {
     const pwd = document.getElementById('loginPassword').value;
     document.getElementById('loginError').textContent = '';
     auth.signInWithEmailAndPassword(email, pwd)
-        .then(() => { showDashboard(); })
         .catch(e => { document.getElementById('loginError').textContent = e.message; });
 }
 function adminLogout() { auth.signOut().then(() => location.reload()); }
 
-auth.onAuthStateChanged(user => {
-    if (user) { showDashboard(); }
+// Only accounts with the `admin` custom claim get in; app shoppers share
+// this Firebase project. Force a token refresh so a newly granted claim
+// is picked up without waiting for the hourly token rotation.
+auth.onAuthStateChanged(async user => {
+    if (!user) return;
+    try {
+        const token = await user.getIdTokenResult(true);
+        if (token.claims.admin === true) {
+            showDashboard();
+            return;
+        }
+        document.getElementById('loginError').textContent = 'This account does not have admin access.';
+    } catch (e) {
+        document.getElementById('loginError').textContent = e.message;
+    }
+    await auth.signOut();
 });
 
 function showDashboard() {
