@@ -17,7 +17,7 @@ const DEFAULT_WEIGHTS = {
 const NEW_PRODUCT_DAYS = 30;
 const REPURCHASE_COOLDOWN_DAYS = 7;
 const DEFAULT_LIMIT = 10;
-const DEFAULT_PER_CATEGORY = 2;
+const DEFAULT_PER_CATEGORY = 3;
 
 function availablePrices(product) {
   return (product.prices || []).filter(
