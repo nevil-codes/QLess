@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QLess — Compare prices</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1C1C22;text-decoration:none}a:hover{color:#4F52B8}
+button{font:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F7F5; color: #1C1C22; font-family: 'Geist', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <div style="padding: 12px 12px 0; display: flex; justify-content: space-between">
+    <a href="Main.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>
+    </a>
+    <button aria-label="Save to list" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 0; background: transparent; color: #1C1C22; border-radius: 12px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 4h10v16l-5-3.5L7 20z"></path></svg>
+    </button>
+  </div>
+
+  <div style="margin: 4px 20px 0; height: 180px; border-radius: 18px; background: #EFEEEA; display: flex; align-items: center; justify-content: center; color: #8A8A93; font-size: 12px">[Product image]</div>
+
+  <div style="padding: 20px 20px 0">
+    <div style="font-size: 12px; color: #6E6E78">Dairy alternatives</div>
+    <h1 style="margin: 6px 0 0; font-size: 22px; font-weight: 500; letter-spacing: -0.02em">Oat drink barista, 1 L</h1>
+    <div style="margin-top: 10px; display: flex; align-items: baseline; gap: 8px">
+      <span style="font-family: 'Geist Mono', monospace; font-size: 20px">€1.19</span>
+      <span style="font-size: 13px; color: #6E6E78">to €1.79 across 4 stores</span>
+    </div>
+  </div>
+
+  <div style="padding: 22px 20px 8px; display: flex; justify-content: space-between; align-items: baseline">
+    <h2 style="margin: 0; font-size: 14px; font-weight: 500">Choose a store</h2>
+    <span style="font-size: 12px; color: #6E6E78">Sorted by price</span>
+  </div>
+
+  <div style="margin: 0 20px; display: flex; flex-direction: column; gap: 8px">
+    <sc-for list="{{stores}}" as="s" hint-placeholder-count="4">
+      <button onClick="{{s.pick}}" style="{{s.style}}">
+        <div style="{{s.ring}}"><div style="{{s.dot}}"></div></div>
+        <div style="flex-grow: 1; text-align: left">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500">{{s.name}}
+            <sc-if value="{{s.lowest}}" hint-placeholder-val="{{ false }}"><span style="font-size: 11px; font-weight: 500; color: #2F7A55; background: #EAF3EE; padding: 2px 7px; border-radius: 6px">Lowest</span></sc-if>
+          </div>
+          <div style="font-size: 12px; color: #6E6E78; margin-top: 3px">{{s.meta}}</div>
+        </div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 14px">{{s.price}}</div>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="flex-grow: 1"></div>
+
+  <div style="padding: 14px 20px 26px; background: #FFFFFF; border-top: 1px solid #E7E6E2; display: flex; gap: 10px; align-items: center">
+    <div style="display: flex; align-items: center; border: 1px solid #E7E6E2; border-radius: 12px; height: 48px">
+      <button onClick="{{dec}}" aria-label="Decrease quantity" style="width: 44px; height: 46px; border: 0; background: transparent; font-size: 18px; color: #3B3B44">−</button>
+      <span style="width: 20px; text-align: center; font-family: 'Geist Mono', monospace; font-size: 14px">{{qty}}</span>
+      <button onClick="{{inc}}" aria-label="Increase quantity" style="width: 44px; height: 46px; border: 0; background: transparent; font-size: 18px; color: #3B3B44">+</button>
+    </div>
+    <a href="Checkout.dc.html" style="flex-grow: 1; height: 48px; border-radius: 12px; background: {{accent}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500">Add to cart · {{total}}</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#4F52B8","options":["#4F52B8","#2F6F6A","#3B3B44","#7A4E9E"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { picked: 0, qty: 2 }; }
+  renderVals() {
+    const accent = this.props.accent ?? '#4F52B8';
+    const data = [
+      { name: 'FreshHub', meta: '0.6 km · in stock', p: 1.19 },
+      { name: 'Corner Market', meta: '1.1 km · in stock', p: 1.39 },
+      { name: 'Daily Grocer', meta: '2.4 km · 3 left', p: 1.49 },
+      { name: 'Stadtmarkt', meta: '3.0 km · in stock', p: 1.79 }
+    ];
+    const stores = data.map((d, i) => {
+      const on = this.state.picked === i;
+      return {
+        name: d.name, meta: d.meta, lowest: i === 0,
+        price: '€' + d.p.toFixed(2),
+        pick: () => this.setState({ picked: i }),
+        style: 'display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:12px 16px;border-radius:14px;background:#FFFFFF;color:#1C1C22;border:1px solid ' + (on ? accent : '#E7E6E2') + ';box-shadow:' + (on ? '0 0 0 1px ' + accent : 'none'),
+        ring: 'width:18px;height:18px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1.5px solid ' + (on ? accent : '#BDBCC4'),
+        dot: 'width:8px;height:8px;border-radius:50%;background:' + (on ? accent : 'transparent')
+      };
+    });
+    const q = this.state.qty;
+    return {
+      accent, stores, qty: q,
+      total: '€' + (data[this.state.picked].p * q).toFixed(2),
+      inc: () => this.setState({ qty: Math.min(9, q + 1) }),
+      dec: () => this.setState({ qty: Math.max(1, q - 1) })
+    };
+  }
+}
+</script>
+</body>
+</html>

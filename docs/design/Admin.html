@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QLess Admin — Dashboard</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#3B3B44;text-decoration:none}a:hover{color:#1C1C22}
+button{font:inherit;cursor:pointer}
+th{font-weight:500;text-align:left}
+</style>
+</helmet>
+<div style="min-height: 860px; box-sizing: border-box; background: #F7F7F5; color: #1C1C22; font-family: 'Geist', system-ui, sans-serif; display: grid; grid-template-columns: 232px minmax(0, 1fr)">
+
+  <aside style="border-right: 1px solid #E7E6E2; background: #FFFFFF; padding: 22px 14px; display: flex; flex-direction: column; gap: 2px">
+    <div style="padding: 0 10px 22px; font-weight: 600; font-size: 17px; letter-spacing: -0.02em">QLess <span style="font-weight: 400; color: #6E6E78; font-size: 13px">Admin</span></div>
+    <a href="#" style="display: flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 10px; background: #F2F1EE; color: #1C1C22; font-size: 14px; font-weight: 500">Dashboard</a>
+    <a href="#" style="display: flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 10px; font-size: 14px">Products</a>
+    <a href="#" style="display: flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 10px; font-size: 14px">Stores</a>
+    <a href="#" style="display: flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 10px; font-size: 14px">Reservations</a>
+    <a href="#" style="display: flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 10px; font-size: 14px">Users</a>
+    <a href="#" style="display: flex; align-items: center; height: 40px; padding: 0 12px; border-radius: 10px; font-size: 14px">Analytics</a>
+  </aside>
+
+  <main style="padding: 28px 36px 40px; display: flex; flex-direction: column; gap: 24px; min-width: 0">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap">
+      <div>
+        <h1 style="margin: 0; font-size: 24px; font-weight: 500; letter-spacing: -0.02em">Dashboard</h1>
+        <div style="margin-top: 4px; font-size: 13px; color: #6E6E78">Thursday, 1 October</div>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <button style="height: 40px; padding: 0 16px; border: 1px solid #E7E6E2; border-radius: 10px; background: #FFFFFF; color: #1C1C22; font-size: 14px">Add store</button>
+        <button style="height: 40px; padding: 0 16px; border: 1px solid {{accent}}; border-radius: 10px; background: {{accent}}; color: #FFFFFF; font-size: 14px">Add product</button>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+      <div style="padding: 18px 20px; background: #FFFFFF; border: 1px solid #E7E6E2; border-radius: 14px">
+        <div style="font-size: 13px; color: #5E5E68">Awaiting pickup</div>
+        <div style="margin-top: 10px; font-family: 'Geist Mono', monospace; font-size: 28px">[—]</div>
+      </div>
+      <div style="padding: 18px 20px; background: #FFFFFF; border: 1px solid #E7E6E2; border-radius: 14px">
+        <div style="font-size: 13px; color: #5E5E68">Collected today</div>
+        <div style="margin-top: 10px; font-family: 'Geist Mono', monospace; font-size: 28px">[—]</div>
+      </div>
+      <div style="padding: 18px 20px; background: #FFFFFF; border: 1px solid #E7E6E2; border-radius: 14px">
+        <div style="font-size: 13px; color: #5E5E68">Products</div>
+        <div style="margin-top: 10px; font-family: 'Geist Mono', monospace; font-size: 28px">[—]</div>
+      </div>
+      <div style="padding: 18px 20px; background: #FFFFFF; border: 1px solid #E7E6E2; border-radius: 14px">
+        <div style="font-size: 13px; color: #5E5E68">Partner stores</div>
+        <div style="margin-top: 10px; font-family: 'Geist Mono', monospace; font-size: 28px">[—]</div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px">
+      <section style="background: #FFFFFF; border: 1px solid #E7E6E2; border-radius: 14px; overflow: hidden">
+        <div style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #EFEEEA">
+          <h2 style="margin: 0; font-size: 15px; font-weight: 500">Recent reservations</h2>
+          <a href="#" style="font-size: 13px; color: #5E5E68">View all</a>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 14px">
+          <thead>
+            <tr style="color: #6E6E78; font-size: 12px">
+              <th style="padding: 10px 20px">Code</th><th style="padding: 10px 8px">Store</th><th style="padding: 10px 8px">Items</th><th style="padding: 10px 8px">Status</th><th style="padding: 10px 20px; text-align: right">Time left</th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+              <tr style="border-top: 1px solid #EFEEEA">
+                <td style="padding: 14px 20px; font-family: 'Geist Mono', monospace; font-size: 13px">{{r.code}}</td>
+                <td style="padding: 14px 8px">{{r.store}}</td>
+                <td style="padding: 14px 8px; color: #5E5E68">{{r.items}}</td>
+                <td style="padding: 14px 8px"><span style="{{r.badge}}">{{r.status}}</span></td>
+                <td style="padding: 14px 20px; text-align: right; font-family: 'Geist Mono', monospace; font-size: 13px; color: #5E5E68">{{r.left}}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </section>
+
+      <section style="background: #FFFFFF; border: 1px solid #E7E6E2; border-radius: 14px; padding: 16px 20px; display: flex; flex-direction: column">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 500">Expiring soon</h2>
+        <div style="font-size: 12px; color: #6E6E78; margin-top: 4px">Under 6 h left · 10% fee applies after</div>
+        <div style="margin-top: 14px; display: flex; flex-direction: column">
+          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid #EFEEEA; font-size: 14px"><span><span style="font-family: 'Geist Mono', monospace; font-size: 13px">QL·4790</span> · Daily Grocer</span><span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #9A5B13">1 h 40</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid #EFEEEA; font-size: 14px"><span><span style="font-family: 'Geist Mono', monospace; font-size: 13px">QL·4772</span> · FreshHub</span><span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #9A5B13">3 h 05</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid #EFEEEA; font-size: 14px"><span><span style="font-family: 'Geist Mono', monospace; font-size: 13px">QL·4768</span> · Stadtmarkt</span><span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: #5E5E68">5 h 52</span></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#4F52B8","options":["#4F52B8","#2F6F6A","#3B3B44","#7A4E9E"]},"$preview":{"width":1360,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const base = 'font-size:12px;font-weight:500;padding:3px 8px;border-radius:6px;white-space:nowrap;';
+    const badge = {
+      'Awaiting pickup': base + 'background:#EEEEF6;color:#3E4196',
+      'Collected': base + 'background:#EAF3EE;color:#2F7A55',
+      'Expired': base + 'background:#F2F1EE;color:#5E5E68'
+    };
+    const rows = [
+      ['QL·4821', 'FreshHub', '3 items', 'Awaiting pickup', '47 h 12'],
+      ['QL·4818', 'Corner Market', '1 item', 'Awaiting pickup', '41 h 30'],
+      ['QL·4809', 'Daily Grocer', '5 items', 'Collected', '—'],
+      ['QL·4801', 'Stadtmarkt', '2 items', 'Collected', '—'],
+      ['QL·4790', 'Daily Grocer', '4 items', 'Awaiting pickup', '1 h 40'],
+      ['QL·4744', 'FreshHub', '2 items', 'Expired', '—']
+    ].map(([code, store, items, status, left]) => ({ code, store, items, status, left, badge: badge[status] }));
+    return { accent: this.props.accent ?? '#4F52B8', rows };
+  }
+}
+</script>
+</body>
+</html>

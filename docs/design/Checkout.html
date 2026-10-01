@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QLess — Review reservation</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1C1C22;text-decoration:none}a:hover{color:#4F52B8}
+button{font:inherit;cursor:pointer}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F7F5; color: #1C1C22; font-family: 'Geist', system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <div style="padding: 12px 12px 0; display: flex; align-items: center; gap: 4px">
+    <a href="Compare.dc.html" aria-label="Back" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>
+    </a>
+    <h1 style="margin: 0; font-size: 17px; font-weight: 500">Review reservation</h1>
+  </div>
+
+  <div style="padding: 18px 20px 0">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 10px">
+      <h2 style="margin: 0; font-size: 14px; font-weight: 500">FreshHub</h2>
+      <span style="font-size: 12px; color: #6E6E78">Rüttenstr. · 0.6 km</span>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E7E6E2; border-radius: 14px">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid #EFEEEA">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: #F0EFEB"></div>
+        <div style="flex-grow: 1"><div style="font-size: 14px">Oat drink barista, 1 L</div><div style="font-size: 12px; color: #6E6E78; margin-top: 2px">Qty 2</div></div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 14px">€2.38</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: #F0EFEB"></div>
+        <div style="flex-grow: 1"><div style="font-size: 14px">Sourdough loaf, 750 g</div><div style="font-size: 12px; color: #6E6E78; margin-top: 2px">Qty 1</div></div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 14px">€3.20</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 22px 20px 0">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 10px">
+      <h2 style="margin: 0; font-size: 14px; font-weight: 500">Corner Market</h2>
+      <span style="font-size: 12px; color: #6E6E78">1.1 km</span>
+    </div>
+    <div style="background: #FFFFFF; border: 1px solid #E7E6E2; border-radius: 14px">
+      <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px">
+        <div style="width: 40px; height: 40px; border-radius: 10px; background: #F0EFEB"></div>
+        <div style="flex-grow: 1"><div style="font-size: 14px">Whole-bean coffee, 500 g</div><div style="font-size: 12px; color: #6E6E78; margin-top: 2px">Qty 1</div></div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 14px">€6.49</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin: 22px 20px 0; padding: 16px; border-radius: 14px; background: #EEEEF6; display: flex; gap: 12px">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{accent}}" stroke-width="1.8" stroke-linecap="round" style="flex-shrink: 0; margin-top: 1px"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg>
+    <div style="font-size: 13px; line-height: 1.5; color: #3B3B44">Items are held for <b style="font-weight: 600; color: #1C1C22">48 hours</b>. You pay at the store when you collect. Uncollected items carry a 10% restocking fee.</div>
+  </div>
+
+  <div style="flex-grow: 1"></div>
+
+  <div style="padding: 16px 20px 26px; background: #FFFFFF; border-top: 1px solid #E7E6E2">
+    <div style="display: flex; justify-content: space-between; font-size: 13px; color: #5E5E68"><span>2 stores · 4 items</span><span style="font-family: 'Geist Mono', monospace">€12.07</span></div>
+    <div style="display: flex; justify-content: space-between; font-size: 13px; color: #5E5E68; margin-top: 6px"><span>Due now</span><span style="font-family: 'Geist Mono', monospace">€0.00</span></div>
+    <a href="Reservation.dc.html" style="margin-top: 14px; height: 50px; border-radius: 12px; background: {{accent}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500">Confirm reservation</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#4F52B8","options":["#4F52B8","#2F6F6A","#3B3B44","#7A4E9E"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#4F52B8' };
+  }
+}
+</script>
+</body>
+</html>
