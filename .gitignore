@@ -19,3 +19,4 @@ local.properties
 /.idea/deviceManager.xml
 /.idea/migrations.xml
 /.idea/studiobot.xml
+/app/google-services.json
