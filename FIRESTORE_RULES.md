@@ -20,7 +20,8 @@ so users can't grant it to themselves. Grant or revoke it from
 `functions/`:
 
 ```bash
-gcloud auth application-default login   # once
+# credentials: gcloud auth application-default login, or a service-account key
+export GOOGLE_APPLICATION_CREDENTIALS=~/keys/qless-admin.json   # keep outside the repo
 node scripts/setAdmin.js admin@qless.com
 node scripts/setAdmin.js admin@qless.com --revoke
 ```
