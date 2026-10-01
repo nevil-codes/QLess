@@ -58,7 +58,9 @@ QLess is a smart shopping app that helps users:
 - `app/build.gradle` - Dependencies
 - `gradle/libs.versions.toml` - Version catalog
 - `FIREBASE_SETUP.md` - Firebase setup guide
-- `FIRESTORE_RULES.md` - Security rules
+- `firestore.rules` / `storage.rules` - Security rules (deploy with `firebase deploy --only firestore:rules,storage`)
+- `functions/` - Cloud Functions (Node 22)
+- `FIRESTORE_RULES.md` - Rules summary
 
 ## Conventions
 - Package: `com.example.qless`
