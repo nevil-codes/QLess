@@ -166,8 +166,8 @@ public class PaymentActivity extends AppCompatActivity {
         showLoading(true, getString(R.string.processing_payment));
 
         // Create payment method params with billing details
-        PaymentMethodCreateParams.BillingDetails billingDetails = 
-                new PaymentMethodCreateParams.BillingDetails.Builder()
+        PaymentMethod.BillingDetails billingDetails =
+                new PaymentMethod.BillingDetails.Builder()
                         .setName(cardholderName)
                         .setEmail(mAuth.getCurrentUser() != null ? 
                                 mAuth.getCurrentUser().getEmail() : null)
