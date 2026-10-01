@@ -35,7 +35,7 @@ QLess is a smart shopping app that helps users:
 - **Database**: Cloud Firestore
 - **Storage**: Firebase Storage (product images)
 - **Location**: Google Play Services + OpenStreetMap Nominatim
-- **ML**: Custom RecommendationEngine class
+- **ML**: Recommendation Cloud Functions in `functions/recs` (europe-west1); the app's `RecommendationEngine` is a thin client. See `docs/recommendations.md`
 
 ## Firebase Collections
 | Collection | Purpose |
@@ -44,7 +44,10 @@ QLess is a smart shopping app that helps users:
 | products | Product catalog |
 | stores | Store listings |
 | reservations | User reservations/orders |
-| user_events | ML analytics data |
+| user_events | Behaviour events (view, search, add_to_cart from the app; purchase from Cloud Functions) |
+| user_profiles | Recommendation profiles, written by Cloud Functions |
+| co_purchases | Products bought together, per product |
+| pickup_log | Marks reservations whose pickup was already recorded |
 
 ## Build/Test Workflows (Gradle)
 ```bash
