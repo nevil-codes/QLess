@@ -1,138 +1,113 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
+
     // ============================================
-    // HELPER FUNCTIONS
+    // HELPERS
     // ============================================
-    
-    // Check if user is authenticated
-    function isAuthenticated() {
+
+    function isSignedIn() {
       return request.auth != null;
     }
-    
-    // Check if user owns this document
+
+    // Granted with functions/scripts/setAdmin.js (custom claim, not a
+    // Firestore field, so users can't grant it to themselves).
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
     function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
+      return isSignedIn() && request.auth.uid == userId;
     }
-    
-    // Check if the userId field matches the authenticated user
-    function isDocOwner() {
-      return isAuthenticated() && resource.data.userId == request.auth.uid;
+
+    function ownsDoc() {
+      return isSignedIn() && resource.data.userId == request.auth.uid;
     }
-    
-    // Check if creating with own userId
-    function isCreatingOwn() {
-      return isAuthenticated() && request.resource.data.userId == request.auth.uid;
+
+    function createsOwn() {
+      return isSignedIn() && request.resource.data.userId == request.auth.uid;
     }
-    
+
+    function changes(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
     // ============================================
-    // USERS COLLECTION
+    // USERS
     // ============================================
-    // Users can only read and write their own profile
+    // Owners manage their own profile; admins can read all of them.
+    // noShowCount is maintained by Cloud Functions only.
     match /users/{userId} {
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && !('noShowCount' in request.resource.data);
+      allow update: if isOwner(userId) && !changes(['noShowCount']);
       allow delete: if isOwner(userId);
     }
-    
+
     // ============================================
-    // PRODUCTS COLLECTION
+    // CATALOG (public read, admin write)
     // ============================================
-    // Anyone can read products (public catalog)
-    // Only authenticated users can write (admin from web panel)
     match /products/{productId} {
       allow read: if true;
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow write: if isAdmin();
     }
-    
-    // ============================================
-    // STORES COLLECTION
-    // ============================================
-    // Anyone can read stores (public listing)
-    // Only authenticated users can write (admin from web panel)
+
     match /stores/{storeId} {
       allow read: if true;
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow write: if isAdmin();
     }
-    
+
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ============================================
-    // RESERVATIONS COLLECTION
+    // RESERVATIONS
     // ============================================
-    // Users can only access their own reservations
+    // Owners still create and update their own reservations because
+    // checkout and payment run on the client for now. Admins can read
+    // and update every reservation (status changes from the panel).
     match /reservations/{reservationId} {
-      // Read own reservations
-      allow read: if isDocOwner();
-      
-      // Create reservation with own userId
-      allow create: if isCreatingOwn();
-      
-      // Update/delete own reservations
-      allow update: if isDocOwner();
-      allow delete: if isDocOwner();
-      
-      // Admin can read all for order management
-      allow read: if isAuthenticated();
+      allow read: if ownsDoc() || isAdmin();
+      allow create: if createsOwn();
+      allow update: if (ownsDoc() && !changes(['userId'])) || isAdmin();
+      allow delete: if ownsDoc();
     }
-    
-    // ============================================
-    // ORDERS COLLECTION (if separate from reservations)
-    // ============================================
+
     match /orders/{orderId} {
-      allow read: if isDocOwner() || isAuthenticated();
-      allow create: if isCreatingOwn();
-      allow update: if isDocOwner() || isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow read: if ownsDoc() || isAdmin();
+      allow create: if createsOwn();
+      allow update, delete: if isAdmin();
     }
-    
+
     // ============================================
-    // USER EVENTS COLLECTION (ML Analytics)
+    // ANALYTICS
     // ============================================
-    // Users can write their own events, admin can read all
+    // Users log their own events; only admins read them. Events are
+    // append-only.
     match /user_events/{eventId} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow read: if isAdmin();
+      allow create: if createsOwn();
     }
-    
+
     // ============================================
-    // CART COLLECTION (if stored in Firestore)
+    // PER-USER DATA
     // ============================================
     match /carts/{userId} {
       allow read, write: if isOwner(userId);
     }
-    
-    // ============================================
-    // FAVORITES/WISHLIST COLLECTION
-    // ============================================
-    match /favorites/{odecId} {
-      allow read: if isDocOwner();
-      allow create: if isCreatingOwn();
-      allow update, delete: if isDocOwner();
+
+    match /favorites/{favoriteId} {
+      allow read: if ownsDoc();
+      allow create: if createsOwn();
+      allow update, delete: if ownsDoc();
     }
-    
-    // ============================================
-    // NOTIFICATIONS COLLECTION
-    // ============================================
+
+    // Only admins send notifications; recipients read and dismiss them.
     match /notifications/{notificationId} {
-      allow read: if isDocOwner();
-      allow create: if isAuthenticated();
-      allow update: if isDocOwner();
-      allow delete: if isDocOwner();
-    }
-    
-    // ============================================
-    // APP SETTINGS/CONFIG (read-only for users)
-    // ============================================
-    match /config/{configId} {
-      allow read: if true;
-      allow write: if isAuthenticated();
+      allow read, update, delete: if ownsDoc();
+      allow create: if isAdmin();
     }
   }
 }
