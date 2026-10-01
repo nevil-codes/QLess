@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 // Grant or revoke the `admin` custom claim for a user.
 //
-// Usage (from functions/):
-//   gcloud auth application-default login   # once
+// Usage (from functions/), with credentials from either:
+//   gcloud auth application-default login
+// or a service-account key (Firebase Console > Project settings >
+// Service accounts > Generate new private key), kept outside the repo:
+//   export GOOGLE_APPLICATION_CREDENTIALS=~/keys/qless-admin.json
+//
 //   node scripts/setAdmin.js admin@qless.com
 //   node scripts/setAdmin.js admin@qless.com --revoke
 //
