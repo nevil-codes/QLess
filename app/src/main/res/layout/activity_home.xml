@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/background"
     tools:context=".HomeActivity">
 
     <ScrollView
@@ -43,34 +43,36 @@
                         android:id="@+id/txtGreeting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-bold"
+                        android:fontFamily="@font/geist_semibold"
+                        android:letterSpacing="-0.02"
                         android:textColor="@color/text_primary"
-                        android:textSize="24sp"
+                        android:textSize="22sp"
                         tools:text="Hi, John!" />
 
                     <LinearLayout
                         android:id="@+id/locationRow"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:background="?attr/selectableItemBackground"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_search_bar"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingVertical="4dp">
+                        android:paddingHorizontal="14dp">
 
                         <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
                             android:contentDescription="@null"
                             android:src="@drawable/ic_location"
-                            app:tint="@color/primary" />
+                            app:tint="@color/text_tertiary" />
 
                         <TextView
                             android:id="@+id/txtLocation"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:textColor="@color/primary"
+                            android:layout_marginStart="6dp"
+                            android:fontFamily="@font/geist_regular"
+                            android:textColor="@color/text_primary"
                             android:textSize="13sp"
                             tools:text="Kray, Nordrhein-Westfalen" />
 
@@ -80,7 +82,7 @@
                             android:layout_marginStart="4dp"
                             android:contentDescription="@null"
                             android:src="@drawable/ic_chevron_right"
-                            app:tint="@color/primary" />
+                            app:tint="@color/text_tertiary" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -88,35 +90,39 @@
                     android:id="@+id/btnNotification"
                     android:layout_width="44dp"
                     android:layout_height="44dp"
+                    android:layout_marginStart="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/nav_home"
-                    android:src="@drawable/ic_notification" />
+                    android:src="@drawable/ic_notification"
+                    app:tint="@color/text_tertiary" />
             </LinearLayout>
 
             <!-- Search Bar -->
             <LinearLayout
                 android:id="@+id/searchBar"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="48dp"
                 android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="18dp"
                 android:background="@drawable/bg_search_bar"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingHorizontal="16dp">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:contentDescription="@null"
-                    android:src="@drawable/ic_search" />
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/text_tertiary" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_marginStart="10dp"
+                    android:fontFamily="@font/geist_regular"
                     android:text="@string/search_products"
-                    android:textColor="@color/text_light"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="15sp" />
             </LinearLayout>
 
@@ -126,10 +132,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="24dp"
-                android:fontFamily="sans-serif-bold"
+                android:fontFamily="@font/geist_medium"
                 android:text="@string/categories"
                 android:textColor="@color/text_primary"
-                android:textSize="18sp" />
+                android:textSize="15sp" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
@@ -159,18 +165,18 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:fontFamily="sans-serif-bold"
+                    android:fontFamily="@font/geist_medium"
                     android:text="@string/best_deals"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="@font/geist_regular"
                     android:text="@string/see_all"
-                    android:textColor="@color/primary"
-                    android:textSize="14sp" />
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -203,18 +209,18 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="sans-serif-bold"
+                        android:fontFamily="@font/geist_medium"
                         android:text="@string/recommended_for_you"
                         android:textColor="@color/text_primary"
-                        android:textSize="18sp" />
+                        android:textSize="15sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
+                        android:fontFamily="@font/geist_regular"
                         android:text="@string/see_all"
-                        android:textColor="@color/primary"
-                        android:textSize="14sp" />
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -240,18 +246,18 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:fontFamily="sans-serif-bold"
+                    android:fontFamily="@font/geist_medium"
                     android:text="@string/nearby_stores"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp" />
+                    android:textSize="15sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-medium"
+                    android:fontFamily="@font/geist_regular"
                     android:text="@string/see_all"
-                    android:textColor="@color/primary"
-                    android:textSize="14sp" />
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp" />
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -267,14 +273,23 @@
     </ScrollView>
 
     <!-- Bottom Navigation -->
+    <View
+        android:id="@+id/bottomNavDivider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/outline"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:elevation="8dp"
-        app:itemIconTint="@color/primary"
-        app:itemTextColor="@color/primary"
+        android:background="@color/surface"
+        android:elevation="0dp"
+        app:itemIconTint="@color/bottom_nav_item_color"
+        app:itemTextColor="@color/bottom_nav_item_color"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

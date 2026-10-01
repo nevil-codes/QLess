@@ -5,9 +5,11 @@
     android:layout_width="160dp"
     android:layout_height="wrap_content"
     android:layout_marginEnd="12dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="0dp">
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/outline"
+    app:cardBackgroundColor="@color/surface">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,6 +25,7 @@
                 android:id="@+id/imgProduct"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/surface_muted"
                 android:contentDescription="@null"
                 android:scaleType="centerCrop"
                 android:src="@drawable/placeholder_product" />
@@ -38,7 +41,7 @@
                 android:paddingVertical="4dp"
                 android:textColor="@color/white"
                 android:textSize="11sp"
-                android:fontFamily="sans-serif-bold"
+                android:fontFamily="@font/geist_medium"
                 tools:text="17% OFF" />
         </FrameLayout>
 
@@ -53,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/geist_medium"
                 android:maxLines="2"
                 android:textColor="@color/text_primary"
                 android:textSize="14sp"
@@ -64,7 +67,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/text_secondary"
+                android:fontFamily="@font/geist_regular"
+                android:textColor="@color/text_tertiary"
                 android:textSize="12sp"
                 tools:text="Cheapest at Tesco" />
 
@@ -79,9 +83,9 @@
                     android:id="@+id/txtPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-bold"
-                    android:textColor="@color/primary"
-                    android:textSize="16sp"
+                    android:fontFamily="@font/geist_mono_medium"
+                    android:textColor="@color/text_primary"
+                    android:textSize="15sp"
                     tools:text="€9.99" />
 
                 <TextView
@@ -89,7 +93,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:textColor="@color/text_light"
+                    android:fontFamily="@font/geist_mono_regular"
+                    android:textColor="@color/text_tertiary"
                     android:textSize="12sp"
                     tools:text="€11.99" />
             </LinearLayout>
@@ -99,7 +104,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="@color/accent"
+                android:fontFamily="@font/geist_regular"
+                android:textColor="@color/text_tertiary"
                 android:textSize="11sp"
                 tools:text="Available in 3 stores" />
         </LinearLayout>
