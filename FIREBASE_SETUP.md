@@ -46,71 +46,19 @@
 4. Select your preferred region
 5. Click **"Enable"**
 
-## Step 6: Firestore Security Rules
+## Step 6: Firestore and Storage Security Rules
 
-Go to **Firebase Console > Firestore Database > Rules** and replace with:
+Rules live in the repo as `firestore.rules` and `storage.rules` (see
+`FIRESTORE_RULES.md` for a summary). Deploy them with the Firebase CLI
+from the repo root:
 
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    
-    // Helper function: Check if user is authenticated
-    function isAuth() {
-      return request.auth != null;
-    }
-    
-    // Helper function: Check if user owns the document
-    function isOwner(userId) {
-      return isAuth() && request.auth.uid == userId;
-    }
-    
-    // Users - users can only access their own profile
-    match /users/{userId} {
-      allow read, write: if isOwner(userId);
-    }
-    
-    // Products - public read, authenticated write
-    match /products/{productId} {
-      allow read: if true;
-      allow write: if isAuth();
-    }
-    
-    // Stores - public read, authenticated write
-    match /stores/{storeId} {
-      allow read: if true;
-      allow write: if isAuth();
-    }
-    
-    // Reservations - users access own, authenticated can read all (for admin)
-    match /reservations/{reservationId} {
-      allow read: if isAuth();
-      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAuth() && resource.data.userId == request.auth.uid;
-    }
-    
-    // Orders - same as reservations
-    match /orders/{orderId} {
-      allow read: if isAuth();
-      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAuth();
-    }
-    
-    // User events for ML analytics
-    match /user_events/{eventId} {
-      allow read, write: if isAuth();
-    }
-    
-    // App config - public read, authenticated write
-    match /config/{configId} {
-      allow read: if true;
-      allow write: if isAuth();
-    }
-  }
-}
+```bash
+firebase login
+firebase deploy --only firestore:rules,storage
 ```
 
-**Important:** After updating rules, click **Publish** to apply them.
+Don't edit rules in the Console; changes there are overwritten by the
+next deploy.
 
 ## Data Structure
 
