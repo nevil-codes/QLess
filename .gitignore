@@ -20,3 +20,8 @@ local.properties
 /.idea/migrations.xml
 /.idea/studiobot.xml
 /app/google-services.json
+
+# Firebase
+.firebase/
+*-debug.log
+functions/node_modules/
