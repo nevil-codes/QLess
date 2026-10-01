@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "test": "jest --passWithNoTests",
     "serve": "firebase emulators:start --only functions,firestore,auth",
-    "deploy": "firebase deploy --only functions"
+    "deploy": "firebase deploy --only functions",
+    "test:rules": "firebase emulators:exec --project demo-qless-rules --only firestore,storage \"jest -c jest.rules.config.js\""
   },
   "dependencies": {
     "firebase-admin": "^14.5.0",
@@ -17,8 +18,16 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@firebase/rules-unit-testing": "^5.0.2",
     "eslint": "^10.11.0",
+    "firebase": "^12.19.0",
     "globals": "^17.13.0",
     "jest": "^30.5.2"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/test/rules/"
+    ]
   }
 }
