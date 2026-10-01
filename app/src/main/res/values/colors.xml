@@ -12,6 +12,7 @@
     <color name="primary_container">#EEEEF6</color>
     <color name="on_primary_container">#3E4196</color>
     <color name="success_container">#EAF3EE</color>
+    <color name="warning_container">#FBF0DF</color>
 
     <!-- Brand colors (existing names, repointed to the flat palette above) -->
     <color name="primary">#4F52B8</color>

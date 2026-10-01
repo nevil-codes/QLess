@@ -4,39 +4,41 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light">
+    android:background="@color/background">
 
     <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:elevation="4dp"
+        android:background="@color/surface"
+        android:elevation="0dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/back"
-            android:src="@drawable/ic_back" />
+            android:src="@drawable/ic_back"
+            app:tint="@color/text_primary" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
-            android:fontFamily="sans-serif-bold"
+            android:fontFamily="@font/geist_medium"
             android:text="@string/my_reservations"
             android:textColor="@color/text_primary"
-            android:textSize="20sp" />
+            android:textSize="17sp" />
     </LinearLayout>
 
     <!-- Tab Layout -->
@@ -44,7 +46,7 @@
         android:id="@+id/tabLayout"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:background="@color/white"
+        android:background="@color/surface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topBar"
@@ -53,7 +55,16 @@
         app:tabIndicatorFullWidth="false"
         app:tabMode="fixed"
         app:tabSelectedTextColor="@color/primary"
-        app:tabTextColor="@color/text_secondary" />
+        app:tabTextColor="@color/text_tertiary" />
+
+    <View
+        android:id="@+id/tabLayoutDivider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/outline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout" />
 
     <!-- Empty State -->
     <LinearLayout
@@ -80,19 +91,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/geist_medium"
             android:text="@string/no_reservations"
             android:textColor="@color/text_primary"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/txtEmptyDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/geist_regular"
             android:gravity="center"
             android:text="@string/no_reservations_desc"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/text_tertiary"
             android:textSize="14sp" />
     </LinearLayout>
 

@@ -185,6 +185,7 @@ public class ReservationsActivity extends AppCompatActivity {
             String status = (String) res.get("status");
             holder.txtStatus.setText(getStatusText(status));
             holder.txtStatus.setBackgroundResource(getStatusBackground(status));
+            holder.txtStatus.setTextColor(getResources().getColor(getStatusTextColor(status), null));
 
             holder.txtStoreName.setText((String) res.get("storeName"));
             holder.txtStoreAddress.setText("Available for pickup");
@@ -232,8 +233,15 @@ public class ReservationsActivity extends AppCompatActivity {
         }
 
         private int getStatusBackground(String status) {
-            // Could create different colored backgrounds for different statuses
+            if ("picked_up".equals(status)) return R.drawable.bg_badge_success_container;
+            if ("expired".equals(status) || "cancelled".equals(status)) return R.drawable.bg_status_badge_muted;
             return R.drawable.bg_status_badge;
+        }
+
+        private int getStatusTextColor(String status) {
+            if ("picked_up".equals(status)) return R.color.success;
+            if ("expired".equals(status) || "cancelled".equals(status)) return R.color.text_tertiary;
+            return R.color.on_primary_container;
         }
 
         @Override
