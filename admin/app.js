@@ -1005,7 +1005,7 @@ function loadOrders() {
 
             // Status badge class
             let statusClass = 'badge-yellow';
-            if (order.status === 'collected' || order.status === 'completed') statusClass = 'badge-green';
+            if (isCollected(order.status)) statusClass = 'badge-green';
             else if (order.status === 'reserved') statusClass = 'badge-blue';
             else if (order.status === 'expired' || order.status === 'cancelled') statusClass = 'badge-red';
             else if (order.status === 'pending_payment') statusClass = 'badge-yellow';
@@ -1018,7 +1018,7 @@ function loadOrders() {
 
             const isReservation = order.type === 'reservation';
             const actionButtons = isReservation ? `
-                <button class="btn btn-sm" title="Mark as Collected" onclick="updateReservation('${order.id}','collected')">📦</button>
+                <button class="btn btn-sm" title="Mark as Picked Up" onclick="updateReservation('${order.id}','picked_up')">📦</button>
                 <button class="btn btn-danger btn-sm" title="Mark as Expired" onclick="updateReservation('${order.id}','expired')">⏰</button>
                 <button class="btn btn-sm" title="View Details" onclick="viewOrderDetails('${order.id}', 'reservation')"><i class="fas fa-eye"></i></button>
             ` : `
@@ -1096,8 +1096,13 @@ function viewOrderDetails(id, type) {
     });
 }
 
+// `collected` is the legacy value the panel wrote before it matched the app's `picked_up`.
+function isCollected(status) {
+    return status === 'picked_up' || status === 'collected' || status === 'completed';
+}
+
 function getStatusClass(status) {
-    if (status === 'collected' || status === 'completed') return 'badge-green';
+    if (isCollected(status)) return 'badge-green';
     if (status === 'reserved') return 'badge-blue';
     if (status === 'expired' || status === 'cancelled') return 'badge-red';
     return 'badge-yellow';
