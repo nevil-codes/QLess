@@ -261,7 +261,7 @@ function getCategoryIconClass(category) {
 
 function highlightMatch(text, query) {
     const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return text.replace(regex, '<strong style="color:#6366F1">$1</strong>');
+    return text.replace(regex, '<strong style="color:#4F52B8">$1</strong>');
 }
 
 function selectProductSuggestion(product) {
@@ -364,7 +364,7 @@ function loadOverview() {
             const time = d.timestamp ? new Date(d.timestamp).toLocaleString() : '—';
             tbody.innerHTML += `<tr><td>${d.userId?.substring(0,8) || '—'}...</td><td><span class="badge badge-${eventColor(d.eventType)}">${d.eventType}</span></td><td>${d.productId?.substring(0,8) || d.query || '—'}</td><td>${d.category || '—'}</td><td>${time}</td></tr>`;
         });
-        if (snap.empty) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#9CA3AF">No events yet. Use the app to generate ML data.</td></tr>';
+        if (snap.empty) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#6E6E78">No events yet. Use the app to generate ML data.</td></tr>';
     });
 }
 function eventColor(type) {
@@ -395,14 +395,14 @@ function renderProducts(products) {
     tbody.innerHTML = '';
 
     if (products.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:40px">No products found in this category</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#6E6E78;padding:40px">No products found in this category</td></tr>';
         return;
     }
 
     products.forEach(p => {
         const prices = p.prices || [];
         const best = prices.length ? Math.min(...prices.map(x => x.price)) : 0;
-        const img = p.imageUrl ? `<img src="${p.imageUrl}" alt="">` : '<div style="width:44px;height:44px;background:#F3F4F6;border-radius:8px"></div>';
+        const img = p.imageUrl ? `<img src="${p.imageUrl}" alt="">` : '<div style="width:44px;height:44px;background:#F0EFEB;border-radius:8px"></div>';
         tbody.innerHTML += `<tr data-category="${p.category || ''}">
             <td>${img}</td>
             <td><strong>${p.name || ''}</strong></td>
@@ -931,7 +931,7 @@ function deleteStore(id) {
 // ===== ORDERS =====
 function loadOrders() {
     const tbody = document.querySelector('#ordersTable tbody');
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:20px"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#6E6E78;padding:20px"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
 
     let allOrders = [];
 
@@ -980,7 +980,7 @@ function loadOrders() {
         tbody.innerHTML = '';
 
         if (allOrders.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9CA3AF;padding:40px"><i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:12px"></i>No orders or reservations yet</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#6E6E78;padding:40px"><i class="fas fa-inbox" style="font-size:24px;display:block;margin-bottom:12px"></i>No orders or reservations yet</td></tr>';
             return;
         }
 
@@ -1069,7 +1069,7 @@ function viewOrderDetails(id, type) {
         });
 
         if (items.length === 0) {
-            itemsTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#9CA3AF">No items</td></tr>';
+            itemsTbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#6E6E78">No items</td></tr>';
         }
 
         // Totals
@@ -1115,7 +1115,7 @@ function loadUsers() {
                 <td>${joined}</td>
             </tr>`;
         });
-        if (snap.empty) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#9CA3AF">No users yet</td></tr>';
+        if (snap.empty) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#6E6E78">No users yet</td></tr>';
     });
 }
 
@@ -1149,7 +1149,7 @@ function loadAnalytics() {
         tagDiv.innerHTML = '';
         const sorted = Object.entries(searchQueries).sort((a,b) => b[1]-a[1]).slice(0,20);
         sorted.forEach(([q, c]) => tagDiv.innerHTML += `<span class="tag">${q} (${c})</span>`);
-        if (!sorted.length) tagDiv.innerHTML = '<span style="color:#9CA3AF">No searches yet</span>';
+        if (!sorted.length) tagDiv.innerHTML = '<span style="color:#6E6E78">No searches yet</span>';
     });
 }
 
@@ -1162,5 +1162,5 @@ function renderBarChart(containerId, scores) {
         const pct = (val / max * 100).toFixed(0);
         div.innerHTML += `<div class="bar-item"><span class="bar-label">${label}</span><div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div><span class="bar-value">${val}</span></div>`;
     });
-    if (!sorted.length) div.innerHTML = '<span style="color:#9CA3AF">No data yet</span>';
+    if (!sorted.length) div.innerHTML = '<span style="color:#6E6E78">No data yet</span>';
 }
