@@ -138,7 +138,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                     EventLogger.getInstance().logView(productId, productCategory, productBrand);
 
                     // === ML: Load Similar Products ===
-                    recEngine.getSimilarProducts(productId, productCategory, productBrand, cheapestPrice, similar -> {
+                    recEngine.getSimilarProducts(productId, similar -> {
                         if (!similar.isEmpty()) {
                             txtSimilarHeader.setVisibility(View.VISIBLE);
                             rvSimilar.setVisibility(View.VISIBLE);
@@ -146,16 +146,14 @@ public class ProductDetailActivity extends AppCompatActivity {
                         }
                     });
 
-                    // === ML: Load Popular in Same Category ===
-                    if (productCategory != null) {
-                        recEngine.getPopularInCategory(productCategory, productId, popular -> {
-                            if (!popular.isEmpty()) {
-                                txtPopularHeader.setVisibility(View.VISIBLE);
-                                rvPopular.setVisibility(View.VISIBLE);
-                                rvPopular.setAdapter(new MiniProductAdapter(popular));
-                            }
-                        });
-                    }
+                    // === ML: Load People Also Buy ===
+                    recEngine.getPeopleAlsoBuy(productId, alsoBought -> {
+                        if (!alsoBought.isEmpty()) {
+                            txtPopularHeader.setVisibility(View.VISIBLE);
+                            rvPopular.setVisibility(View.VISIBLE);
+                            rvPopular.setAdapter(new MiniProductAdapter(alsoBought));
+                        }
+                    });
                 });
     }
 
