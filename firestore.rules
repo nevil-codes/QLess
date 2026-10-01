@@ -85,10 +85,18 @@ service cloud.firestore {
     // ANALYTICS
     // ============================================
     // Users log their own events; only admins read them. Events are
-    // append-only.
+    // append-only. Purchases are logged by Cloud Functions when a
+    // reservation is picked up, never by the client.
     match /user_events/{eventId} {
       allow read: if isAdmin();
-      allow create: if createsOwn();
+      allow create: if createsOwn()
+        && request.resource.data.eventType in ['view', 'search', 'add_to_cart'];
+    }
+
+    // Recommendation profiles are built by Cloud Functions from
+    // user_events; owners can read their own.
+    match /user_profiles/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
     }
 
     // ============================================

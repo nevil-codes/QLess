@@ -143,8 +143,17 @@ describe("orders", () => {
 
 describe("user_events", () => {
   test("users log their own events only", async () => {
-    await assertSucceeds(addDoc(collection(shopper(), "user_events"), { userId: "shopper" }));
-    await assertFails(addDoc(collection(shopper(), "user_events"), { userId: "other" }));
+    const ev = { userId: "shopper", eventType: "view" };
+    await assertSucceeds(addDoc(collection(shopper(), "user_events"), ev));
+    await assertFails(addDoc(collection(shopper(), "user_events"), { ...ev, userId: "other" }));
+  });
+
+  test("clients can log view, search and add_to_cart but not purchase", async () => {
+    for (const eventType of ["view", "search", "add_to_cart"]) {
+      await assertSucceeds(addDoc(collection(shopper(), "user_events"), { userId: "shopper", eventType }));
+    }
+    await assertFails(addDoc(collection(shopper(), "user_events"), { userId: "shopper", eventType: "purchase" }));
+    await assertFails(addDoc(collection(shopper(), "user_events"), { userId: "shopper" }));
   });
 
   test("events are append-only and admin-read", async () => {
@@ -152,6 +161,25 @@ describe("user_events", () => {
     await assertFails(updateDoc(doc(shopper(), "user_events/e1"), { eventType: "x" }));
     await assertFails(deleteDoc(doc(shopper(), "user_events/e1")));
     await assertSucceeds(getDocs(collection(admin(), "user_events")));
+  });
+});
+
+describe("user_profiles", () => {
+  beforeEach(async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "user_profiles/shopper"), { categoryPrefs: { Dairy: 1 } });
+    });
+  });
+
+  test("owner and admin can read; nobody else", async () => {
+    await assertSucceeds(getDoc(doc(shopper(), "user_profiles/shopper")));
+    await assertSucceeds(getDoc(doc(admin(), "user_profiles/shopper")));
+    await assertFails(getDoc(doc(other(), "user_profiles/shopper")));
+  });
+
+  test("clients cannot write profiles, even their own", async () => {
+    await assertFails(setDoc(doc(shopper(), "user_profiles/shopper"), { categoryPrefs: { X: 99 } }));
+    await assertFails(updateDoc(doc(shopper(), "user_profiles/shopper"), { avgPrice: 1 }));
   });
 });
 
