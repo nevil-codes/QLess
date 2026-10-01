@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/background"
     tools:context=".CartActivity">
 
     <!-- Top Bar -->
@@ -34,10 +34,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:fontFamily="sans-serif-bold"
+            android:layout_marginStart="4dp"
+            android:fontFamily="@font/geist_medium"
             android:text="@string/your_cart"
             android:textColor="@color/text_primary"
-            android:textSize="20sp" />
+            android:textSize="17sp" />
     </LinearLayout>
 
     <!-- Cart Items -->
@@ -76,17 +77,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/geist_medium"
             android:text="@string/cart_empty"
             android:textColor="@color/text_primary"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/geist_regular"
             android:text="@string/cart_empty_desc"
-            android:textColor="@color/text_secondary"
+            android:textColor="@color/text_tertiary"
             android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -95,18 +97,29 @@
             android:layout_height="48dp"
             android:layout_marginTop="24dp"
             android:backgroundTint="@color/primary"
+            android:fontFamily="@font/geist_medium"
             android:text="@string/browse_products"
             android:textAllCaps="false"
-            app:cornerRadius="24dp" />
+            app:cornerRadius="12dp"
+            app:elevation="0dp" />
     </LinearLayout>
 
     <!-- Bottom Checkout Section -->
+    <View
+        android:id="@+id/bottomSectionDivider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/outline"
+        app:layout_constraintBottom_toTopOf="@id/bottomSection"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <LinearLayout
         android:id="@+id/bottomSection"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:elevation="8dp"
+        android:background="@color/surface"
+        android:elevation="0dp"
         android:orientation="vertical"
         android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -122,32 +135,34 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/geist_regular"
                 android:text="@string/total"
                 android:textColor="@color/text_secondary"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/txtTotal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-bold"
+                android:fontFamily="@font/geist_mono_medium"
                 android:textColor="@color/text_primary"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 tools:text="€29.97" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCheckout"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="14dp"
             android:backgroundTint="@color/primary"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/geist_medium"
             android:text="@string/reserve_pay"
             android:textAllCaps="false"
             android:textColor="@color/white"
-            android:textSize="16sp"
-            app:cornerRadius="28dp" />
+            android:textSize="15sp"
+            app:cornerRadius="12dp"
+            app:elevation="0dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
 
