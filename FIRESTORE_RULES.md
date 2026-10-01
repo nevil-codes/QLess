@@ -13,18 +13,36 @@ Test locally against the emulators with:
 firebase emulators:start --only firestore,storage
 ```
 
-## Rules Summary:
+## Admin accounts
+
+Admin access comes from the `admin` custom claim, not a Firestore field,
+so users can't grant it to themselves. Grant or revoke it from
+`functions/`:
+
+```bash
+gcloud auth application-default login   # once
+node scripts/setAdmin.js admin@qless.com
+node scripts/setAdmin.js admin@qless.com --revoke
+```
+
+## Rules summary
 
 | Collection | Read | Create | Update | Delete |
 |------------|------|--------|--------|--------|
-| users | Own only | Own only | Own only | Own only |
-| products | Public | Auth | Auth | Auth |
-| stores | Public | Auth | Auth | Auth |
-| reservations | Own + Admin | Own | Own | Own |
-| orders | Own + Admin | Own | Own + Admin | Admin |
-| user_events | Auth | Auth | Auth | Auth |
-| carts | Own only | Own only | Own only | Own only |
-| favorites | Own only | Own only | Own only | Own only |
-| notifications | Own only | Auth | Own only | Own only |
-| config | Public | Auth | Auth | Auth |
+| users | Own, admin | Own (no `noShowCount`) | Own (no `noShowCount`) | Own |
+| products | Public | Admin | Admin | Admin |
+| stores | Public | Admin | Admin | Admin |
+| config | Public | Admin | Admin | Admin |
+| reservations | Own, admin | Own | Own (can't change `userId`), admin | Own |
+| orders | Own, admin | Own | Admin | Admin |
+| user_events | Admin | Own | none | none |
+| carts | Own | Own | Own | Own |
+| favorites | Own | Own | Own | Own |
+| notifications | Own | Admin | Own | Own |
+| Storage `products/*` | Public | Admin | Admin | Admin |
 
+## Testing
+
+```bash
+cd functions && npm run test:rules
+```
