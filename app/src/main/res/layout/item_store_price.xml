@@ -11,10 +11,11 @@
     android:padding="16dp">
 
     <ImageView
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
         android:contentDescription="@null"
-        android:src="@drawable/ic_store" />
+        android:src="@drawable/ic_store"
+        app:tint="@color/text_tertiary" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -27,9 +28,9 @@
             android:id="@+id/txtStoreName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/geist_medium"
             android:textColor="@color/text_primary"
-            android:textSize="15sp"
+            android:textSize="14sp"
             tools:text="Tesco Piccadilly" />
 
         <TextView
@@ -37,6 +38,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+            android:fontFamily="@font/geist_regular"
             android:textSize="12sp"
             tools:text="In Stock" />
     </LinearLayout>
@@ -51,16 +53,17 @@
             android:id="@+id/txtPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-bold"
+            android:fontFamily="@font/geist_mono_medium"
             android:textColor="@color/text_primary"
-            android:textSize="17sp"
+            android:textSize="15sp"
             tools:text="€9.99" />
 
         <TextView
             android:id="@+id/txtOriginalPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_light"
+            android:fontFamily="@font/geist_mono_regular"
+            android:textColor="@color/text_tertiary"
             android:textSize="12sp"
             tools:text="€11.99" />
     </LinearLayout>
@@ -71,13 +74,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:background="@drawable/bg_price_tag"
-        android:paddingHorizontal="8dp"
+        android:background="@drawable/bg_badge_success_container"
+        android:paddingHorizontal="7dp"
         android:paddingVertical="3dp"
-        android:text="Best"
-        android:textColor="@color/white"
-        android:textSize="10sp"
-        android:fontFamily="sans-serif-bold"
+        android:text="@string/lowest_price"
+        android:textColor="@color/success"
+        android:textSize="11sp"
+        android:fontFamily="@font/geist_medium"
         android:visibility="gone" />
 </LinearLayout>
 

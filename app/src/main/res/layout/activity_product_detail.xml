@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/background"
     tools:context=".ProductDetailActivity">
 
     <ScrollView
@@ -25,7 +25,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="280dp"
-                android:background="@color/surface_variant">
+                android:background="@color/surface_muted">
 
                 <ImageView
                     android:id="@+id/imgProduct"
@@ -44,6 +44,7 @@
                     android:layout_marginTop="40dp"
                     android:background="@drawable/bg_search_bar"
                     android:contentDescription="@string/back"
+                    android:padding="12dp"
                     android:src="@drawable/ic_back"
                     app:tint="@color/text_primary" />
             </FrameLayout>
@@ -59,19 +60,20 @@
                     android:id="@+id/txtCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/primary"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/geist_regular"
                     tools:text="Groceries" />
 
                 <TextView
                     android:id="@+id/txtProductName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="sans-serif-bold"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/geist_semibold"
+                    android:letterSpacing="-0.02"
                     android:textColor="@color/text_primary"
-                    android:textSize="24sp"
+                    android:textSize="22sp"
                     tools:text="Basmati Rice 5kg" />
 
                 <TextView
@@ -79,6 +81,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
+                    android:fontFamily="@font/geist_regular"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
                     tools:text="Royal Basmati" />
@@ -102,7 +105,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:fontFamily="sans-serif-medium"
+                        android:fontFamily="@font/geist_medium"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp"
                         tools:text="4.7" />
@@ -112,7 +115,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:textColor="@color/text_secondary"
+                        android:fontFamily="@font/geist_regular"
+                        android:textColor="@color/text_tertiary"
                         android:textSize="13sp"
                         tools:text="(156 reviews)" />
                 </LinearLayout>
@@ -122,6 +126,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:fontFamily="@font/geist_regular"
                     android:lineSpacingMultiplier="1.4"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp"
@@ -131,11 +136,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="28dp"
-                    android:fontFamily="sans-serif-bold"
+                    android:layout_marginTop="26dp"
+                    android:fontFamily="@font/geist_medium"
                     android:text="@string/price_comparison"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp" />
+                    android:textSize="15sp" />
 
                 <!-- Price List from stores -->
                 <androidx.recyclerview.widget.RecyclerView
@@ -151,10 +156,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="28dp"
-                    android:fontFamily="sans-serif-bold"
+                    android:fontFamily="@font/geist_medium"
                     android:text="@string/similar_products"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp"
+                    android:textSize="15sp"
                     android:visibility="gone" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -173,10 +178,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="28dp"
-                    android:fontFamily="sans-serif-bold"
+                    android:fontFamily="@font/geist_medium"
                     android:text="@string/people_also_buy"
                     android:textColor="@color/text_primary"
-                    android:textSize="18sp"
+                    android:textSize="15sp"
                     android:visibility="gone" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -193,12 +198,21 @@
     </ScrollView>
 
     <!-- Bottom Add to Cart -->
+    <View
+        android:id="@+id/bottomBarDivider"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/outline"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:elevation="8dp"
+        android:background="@color/surface"
+        android:elevation="0dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="16dp"
@@ -215,32 +229,34 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/geist_regular"
                 android:text="Best Price"
-                android:textColor="@color/text_secondary"
+                android:textColor="@color/text_tertiary"
                 android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/txtBestPrice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-bold"
-                android:textColor="@color/primary"
-                android:textSize="22sp"
+                android:fontFamily="@font/geist_mono_medium"
+                android:textColor="@color/text_primary"
+                android:textSize="20sp"
                 tools:text="€9.99" />
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddToCart"
             android:layout_width="wrap_content"
-            android:layout_height="52dp"
+            android:layout_height="50dp"
             android:backgroundTint="@color/primary"
-            android:fontFamily="sans-serif-medium"
+            android:fontFamily="@font/geist_medium"
             android:paddingHorizontal="32dp"
             android:text="@string/add_to_cart"
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="15sp"
-            app:cornerRadius="26dp" />
+            app:cornerRadius="12dp"
+            app:elevation="0dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
 

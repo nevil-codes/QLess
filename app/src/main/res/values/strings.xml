@@ -62,6 +62,7 @@
     <string name="best_deals">Best Deals Near You</string>
     <string name="nearby_stores">Stores Near You</string>
     <string name="see_all">See All</string>
+    <string name="lowest_price">Lowest</string>
     <string name="open_now">Open Now</string>
     <string name="closed">Closed</string>
     <string name="km_away">%1$.1f km</string>
