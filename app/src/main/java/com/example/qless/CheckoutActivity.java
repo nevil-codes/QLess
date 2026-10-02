@@ -2,6 +2,7 @@ package com.example.qless;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,17 +11,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.FirebaseFunctionsException;
+import com.stripe.android.PaymentConfiguration;
+import com.stripe.android.paymentsheet.PaymentSheet;
+import com.stripe.android.paymentsheet.PaymentSheetResult;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,31 +36,34 @@ import java.util.Map;
 
 public class CheckoutActivity extends AppCompatActivity {
 
-    private static final int PAYMENT_REQUEST_CODE = 1001;
+    private static final String TAG = "CheckoutActivity";
+    private static final String REGION = "europe-west1";
     private static final int PICKUP_HOLD_HOURS = 12;
     private static final int CARD_HOLD_HOURS = 48;
     private static final int MAX_NO_SHOWS = 3;
+    private static final double CARD_SERVICE_FEE = 0.99;
 
     private TextView txtSubtotal, txtServiceFee, txtTotal;
     private TextView txtStoreName, txtStoreAddress, txtPickupDeadline;
     private TextView txtPickupWindow, txtMissedPickupPolicy, txtPaymentNotice, txtPickupOptionDetail;
     private MaterialCardView optionPickup, optionCard;
     private MaterialRadioButton radioPickup, radioCard;
-    private com.google.android.material.button.MaterialButton btnConfirm;
+    private MaterialButton btnConfirm;
     private RecyclerView rvOrderItems;
     private FrameLayout loadingOverlay;
 
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private FirebaseFunctions functions;
+    private PaymentSheet paymentSheet;
+
+    private List<CartManager.CartItem> cartItems;
+    private double subtotal;
     private boolean payAtPickup = true;
     private boolean pickupBlocked = false;
 
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
-    private List<CartManager.CartItem> cartItems;
-    private double subtotal, serviceFee, total;
-    
-    private String pendingReservationId;
-
-    private static final double SERVICE_FEE_RATE = 0.99; // Fixed service fee
+    // The createReservation response while the payment sheet is open.
+    private Map<String, Object> pendingCheckout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +72,9 @@ public class CheckoutActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        functions = FirebaseFunctions.getInstance(REGION);
+        // Must be created in onCreate: it registers for an activity result.
+        paymentSheet = new PaymentSheet(this, this::onPaymentSheetResult);
 
         initViews();
         loadOrderData();
@@ -90,14 +100,44 @@ public class CheckoutActivity extends AppCompatActivity {
         loadingOverlay = findViewById(R.id.loadingOverlay);
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
-        btnConfirm.setOnClickListener(v -> {
-            if (payAtPickup) reserveForPickup();
-            else proceedToPayment();
-        });
+        btnConfirm.setOnClickListener(v -> reserve());
         optionPickup.setOnClickListener(v -> selectPaymentMethod(true));
         optionCard.setOnClickListener(v -> selectPaymentMethod(false));
 
         rvOrderItems.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    private void loadOrderData() {
+        cartItems = CartManager.getInstance().getItems();
+        if (cartItems.isEmpty()) {
+            finish();
+            return;
+        }
+
+        subtotal = CartManager.getInstance().getTotal();
+        txtSubtotal.setText(String.format(Locale.getDefault(), "€%.2f", subtotal));
+
+        List<String> storeNames = new ArrayList<>();
+        for (CartManager.CartItem item : cartItems) {
+            if (item.storeName != null && !storeNames.contains(item.storeName)) storeNames.add(item.storeName);
+        }
+        txtStoreName.setText(joinStores(storeNames));
+        txtStoreAddress.setText("Available for pickup");
+
+        rvOrderItems.setAdapter(new OrderItemsAdapter(cartItems));
+
+        if (BuildConfig.STRIPE_PUBLISHABLE_KEY.isEmpty()) {
+            // Builds without a Stripe key (e.g. CI) can't take card payments.
+            optionCard.setEnabled(false);
+            optionCard.setAlpha(0.5f);
+        }
+        selectPaymentMethod(true);
+        loadNoShowCount();
+    }
+
+    private String joinStores(List<String> names) {
+        if (names.isEmpty()) return "";
+        return names.size() > 1 ? getString(R.string.stores_more, names.get(0), names.size() - 1) : names.get(0);
     }
 
     // Users with too many missed pickups must prepay; the server enforces
@@ -123,6 +163,7 @@ public class CheckoutActivity extends AppCompatActivity {
 
     private void selectPaymentMethod(boolean pickup) {
         if (pickup && pickupBlocked) return;
+        if (!pickup && !optionCard.isEnabled()) return;
         payAtPickup = pickup;
         styleOption(optionPickup, radioPickup, pickup);
         styleOption(optionCard, radioCard, !pickup);
@@ -136,10 +177,9 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     private void refreshSummary() {
-        serviceFee = payAtPickup ? 0 : SERVICE_FEE_RATE;
-        total = subtotal + serviceFee;
+        double serviceFee = payAtPickup ? 0 : CARD_SERVICE_FEE;
         txtServiceFee.setText(String.format(Locale.getDefault(), "€%.2f", serviceFee));
-        txtTotal.setText(String.format(Locale.getDefault(), "€%.2f", total));
+        txtTotal.setText(String.format(Locale.getDefault(), "€%.2f", subtotal + serviceFee));
 
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.HOUR, payAtPickup ? PICKUP_HOLD_HOURS : CARD_HOLD_HOURS);
@@ -153,32 +193,9 @@ public class CheckoutActivity extends AppCompatActivity {
         btnConfirm.setText(payAtPickup ? R.string.reserve_pay_at_pickup : R.string.continue_to_payment);
     }
 
-    private void loadOrderData() {
-        cartItems = CartManager.getInstance().getItems();
-
-        if (cartItems.isEmpty()) {
-            finish();
-            return;
-        }
-
-        subtotal = CartManager.getInstance().getTotal();
-        txtSubtotal.setText(String.format(Locale.getDefault(), "€%.2f", subtotal));
-
-        List<String> storeNames = new ArrayList<>();
-        for (CartManager.CartItem item : cartItems) {
-            if (item.storeName != null && !storeNames.contains(item.storeName)) storeNames.add(item.storeName);
-        }
-        txtStoreName.setText(storeNames.size() > 1
-                ? getString(R.string.stores_more, storeNames.get(0), storeNames.size() - 1)
-                : storeNames.isEmpty() ? "" : storeNames.get(0));
-        txtStoreAddress.setText("Available for pickup");
-
-        rvOrderItems.setAdapter(new OrderItemsAdapter(cartItems));
-        selectPaymentMethod(true);
-        loadNoShowCount();
-    }
-
-    private void reserveForPickup() {
+    // Prices, stock and reservations are all handled by the createReservation
+    // function; card checkouts then go through Stripe's payment sheet.
+    private void reserve() {
         if (mAuth.getCurrentUser() == null) {
             Toast.makeText(this, R.string.auth_error, Toast.LENGTH_SHORT).show();
             return;
@@ -193,29 +210,80 @@ public class CheckoutActivity extends AppCompatActivity {
             items.add(line);
         }
         Map<String, Object> data = new HashMap<>();
-        data.put("paymentMethod", "pickup");
+        data.put("paymentMethod", payAtPickup ? "pickup" : "card");
         data.put("items", items);
 
         showLoading(true);
-        FirebaseFunctions.getInstance("europe-west1")
-                .getHttpsCallable("createReservation")
+        functions.getHttpsCallable("createReservation")
                 .call(data)
                 .addOnSuccessListener(result -> {
                     showLoading(false);
-                    onPickupReserved(result.getData());
+                    onReservationCreated(result.getData());
                 })
                 .addOnFailureListener(e -> {
                     showLoading(false);
-                    onPickupFailed(e);
+                    onReservationFailed(e);
                 });
     }
 
     @SuppressWarnings("unchecked")
-    private void onPickupReserved(Object body) {
-        List<Map<String, Object>> reservations = new ArrayList<>();
-        if (body instanceof Map && ((Map<String, Object>) body).get("reservations") instanceof List) {
-            reservations = (List<Map<String, Object>>) ((Map<String, Object>) body).get("reservations");
+    private void onReservationCreated(Object body) {
+        if (!(body instanceof Map)) {
+            Toast.makeText(this, R.string.reservation_failed, Toast.LENGTH_LONG).show();
+            return;
         }
+        Map<String, Object> checkout = (Map<String, Object>) body;
+        if (payAtPickup) {
+            showConfirmation(checkout, true);
+            return;
+        }
+
+        Object clientSecret = checkout.get("clientSecret");
+        if (!(clientSecret instanceof String)) {
+            Toast.makeText(this, R.string.reservation_failed, Toast.LENGTH_LONG).show();
+            return;
+        }
+        pendingCheckout = checkout;
+        PaymentConfiguration.init(getApplicationContext(), BuildConfig.STRIPE_PUBLISHABLE_KEY);
+        paymentSheet.presentWithPaymentIntent((String) clientSecret,
+                new PaymentSheet.Configuration(getString(R.string.app_name)));
+    }
+
+    private void onPaymentSheetResult(PaymentSheetResult result) {
+        Map<String, Object> checkout = pendingCheckout;
+        pendingCheckout = null;
+        if (checkout == null) return;
+
+        if (result instanceof PaymentSheetResult.Completed) {
+            // The reservation turns "reserved" when Stripe's webhook confirms
+            // the payment; the sheet only tells us it went through.
+            showConfirmation(checkout, false);
+            return;
+        }
+
+        cancelPendingPayment(checkout.get("paymentIntentId"));
+        if (result instanceof PaymentSheetResult.Failed) {
+            Log.w(TAG, "Payment failed", ((PaymentSheetResult.Failed) result).getError());
+            Toast.makeText(this, R.string.payment_failed, Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, R.string.payment_cancelled, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Releases the held stock right away instead of waiting for the
+    // abandoned payment to expire.
+    private void cancelPendingPayment(Object paymentIntentId) {
+        if (!(paymentIntentId instanceof String)) return;
+        Map<String, Object> data = new HashMap<>();
+        data.put("paymentIntentId", paymentIntentId);
+        functions.getHttpsCallable("cancelPendingPayment").call(data)
+                .addOnFailureListener(e -> Log.w(TAG, "cancelPendingPayment failed", e));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void showConfirmation(Map<String, Object> checkout, boolean pickup) {
+        List<Map<String, Object>> reservations = checkout.get("reservations") instanceof List
+                ? (List<Map<String, Object>>) checkout.get("reservations") : new ArrayList<>();
         if (reservations.isEmpty()) {
             Toast.makeText(this, R.string.reservation_failed, Toast.LENGTH_LONG).show();
             return;
@@ -228,16 +296,13 @@ public class CheckoutActivity extends AppCompatActivity {
             storeNames.add(String.valueOf(r.get("storeName")));
             if (r.get("total") instanceof Number) reservedTotal += ((Number) r.get("total")).doubleValue();
         }
-        String stores = storeNames.size() > 1
-                ? getString(R.string.stores_more, storeNames.get(0), storeNames.size() - 1)
-                : storeNames.get(0);
 
         CartManager.getInstance().clear();
         Intent intent = new Intent(this, PaymentSuccessActivity.class);
         intent.putExtra(PaymentSuccessActivity.EXTRA_ORDER_ID, String.valueOf(first.get("reservationId")));
         intent.putExtra(PaymentSuccessActivity.EXTRA_AMOUNT, reservedTotal);
-        intent.putExtra(PaymentSuccessActivity.EXTRA_STORE_NAME, stores);
-        intent.putExtra(PaymentSuccessActivity.EXTRA_PAY_AT_PICKUP, true);
+        intent.putExtra(PaymentSuccessActivity.EXTRA_STORE_NAME, joinStores(storeNames));
+        intent.putExtra(PaymentSuccessActivity.EXTRA_PAY_AT_PICKUP, pickup);
         intent.putExtra(PaymentSuccessActivity.EXTRA_PICKUP_CODE, String.valueOf(first.get("pickupCode")));
         if (first.get("pickupDeadline") instanceof Number) {
             intent.putExtra(PaymentSuccessActivity.EXTRA_DEADLINE, ((Number) first.get("pickupDeadline")).longValue());
@@ -248,7 +313,7 @@ public class CheckoutActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("unchecked")
-    private void onPickupFailed(Exception e) {
+    private void onReservationFailed(Exception e) {
         String reason = null;
         if (e instanceof FirebaseFunctionsException
                 && ((FirebaseFunctionsException) e).getDetails() instanceof Map) {
@@ -261,148 +326,8 @@ public class CheckoutActivity extends AppCompatActivity {
         } else if ("unavailable".equals(reason)) {
             Toast.makeText(this, R.string.reservation_unavailable, Toast.LENGTH_LONG).show();
         } else {
-            android.util.Log.e("CheckoutActivity", "createReservation failed", e);
+            Log.e(TAG, "createReservation failed", e);
             Toast.makeText(this, R.string.reservation_failed, Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void proceedToPayment() {
-        if (mAuth.getCurrentUser() == null) {
-            Toast.makeText(this, R.string.auth_error, Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (cartItems == null || cartItems.isEmpty()) {
-            Toast.makeText(this, "Cart is empty", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        showLoading(true);
-
-        // First create the reservation (pending payment)
-        String userId = mAuth.getCurrentUser().getUid();
-        pendingReservationId = "RES-" + System.currentTimeMillis();
-
-        // Build items list for Firestore
-        List<Map<String, Object>> items = new ArrayList<>();
-        for (CartManager.CartItem item : cartItems) {
-            Map<String, Object> itemMap = new HashMap<>();
-            itemMap.put("productId", item.productId);
-            itemMap.put("productName", item.name);
-            itemMap.put("storeName", item.storeName);
-            itemMap.put("price", item.price);
-            itemMap.put("quantity", item.quantity);
-            items.add(itemMap);
-        }
-
-        // Calculate deadline
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.HOUR, 48);
-
-        // Create reservation document (pending payment)
-        Map<String, Object> reservation = new HashMap<>();
-        reservation.put("reservationId", pendingReservationId);
-        reservation.put("userId", userId);
-        reservation.put("items", items);
-        reservation.put("subtotal", subtotal);
-        reservation.put("serviceFee", serviceFee);
-        reservation.put("total", total);
-        reservation.put("storeName", cartItems.get(0).storeName);
-        reservation.put("status", "pending_payment");
-        reservation.put("paymentStatus", "pending");
-        reservation.put("createdAt", System.currentTimeMillis());
-        reservation.put("pickupDeadline", cal.getTimeInMillis());
-
-        db.collection("reservations").document(pendingReservationId)
-                .set(reservation)
-                .addOnSuccessListener(aVoid -> {
-                    showLoading(false);
-                    
-                    // Open payment activity
-                    Intent paymentIntent = new Intent(this, PaymentActivity.class);
-                    paymentIntent.putExtra(PaymentActivity.EXTRA_AMOUNT, total);
-                    paymentIntent.putExtra(PaymentActivity.EXTRA_RESERVATION_ID, pendingReservationId);
-                    paymentIntent.putExtra(PaymentActivity.EXTRA_STORE_NAME, cartItems.get(0).storeName);
-                    startActivityForResult(paymentIntent, PAYMENT_REQUEST_CODE);
-                })
-                .addOnFailureListener(e -> {
-                    showLoading(false);
-                    android.util.Log.e("CheckoutActivity", "Failed to create reservation", e);
-                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        
-        if (requestCode == PAYMENT_REQUEST_CODE) {
-            if (resultCode == RESULT_OK && data != null && data.getBooleanExtra("payment_success", false)) {
-                // Payment successful
-                onPaymentSuccess();
-            } else {
-                // Payment cancelled or failed - delete pending reservation
-                onPaymentCancelled();
-            }
-        }
-    }
-
-    private void onPaymentSuccess() {
-        // Update reservation status
-        if (pendingReservationId != null) {
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("status", "reserved");
-            updates.put("paymentStatus", "paid");
-
-            String storeName = cartItems.get(0).storeName;
-
-            db.collection("reservations").document(pendingReservationId)
-                    .update(updates)
-                    .addOnSuccessListener(aVoid -> {
-                        // Clear cart
-                        CartManager.getInstance().clear();
-                        
-                        // Navigate to PaymentSuccessActivity
-                        Intent intent = new Intent(this, PaymentSuccessActivity.class);
-                        intent.putExtra(PaymentSuccessActivity.EXTRA_ORDER_ID, pendingReservationId);
-                        intent.putExtra(PaymentSuccessActivity.EXTRA_AMOUNT, total);
-                        intent.putExtra(PaymentSuccessActivity.EXTRA_STORE_NAME, storeName);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        // Still clear cart and navigate - payment was successful
-                        CartManager.getInstance().clear();
-                        
-                        Intent intent = new Intent(this, PaymentSuccessActivity.class);
-                        intent.putExtra(PaymentSuccessActivity.EXTRA_ORDER_ID, pendingReservationId);
-                        intent.putExtra(PaymentSuccessActivity.EXTRA_AMOUNT, total);
-                        intent.putExtra(PaymentSuccessActivity.EXTRA_STORE_NAME, storeName);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                        finish();
-                    });
-        } else {
-            CartManager.getInstance().clear();
-            
-            // Navigate to PaymentSuccessActivity even without reservation ID
-            Intent intent = new Intent(this, PaymentSuccessActivity.class);
-            intent.putExtra(PaymentSuccessActivity.EXTRA_AMOUNT, total);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        }
-    }
-
-    private void onPaymentCancelled() {
-        // Delete the pending reservation
-        if (pendingReservationId != null) {
-            db.collection("reservations").document(pendingReservationId)
-                    .delete()
-                    .addOnCompleteListener(task -> {
-                        Toast.makeText(this, R.string.payment_cancelled, Toast.LENGTH_SHORT).show();
-                    });
         }
     }
 
@@ -410,7 +335,6 @@ public class CheckoutActivity extends AppCompatActivity {
         loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
-    // Adapter for order items
     private class OrderItemsAdapter extends RecyclerView.Adapter<OrderItemsAdapter.VH> {
         private final List<CartManager.CartItem> items;
 
@@ -451,4 +375,3 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 }
-

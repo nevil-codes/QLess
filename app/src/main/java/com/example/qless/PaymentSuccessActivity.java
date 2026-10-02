@@ -46,10 +46,10 @@ public class PaymentSuccessActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.txtSuccessTitle)).setText(R.string.reserved_title);
             ((TextView) findViewById(R.id.txtConfirmationMessage)).setText(R.string.reserved_pickup_message);
             ((TextView) findViewById(R.id.txtAmountLabel)).setText(R.string.pay_at_pickup_amount);
-            if (pickupCode != null) {
-                ((TextView) findViewById(R.id.txtOrderIdLabel)).setText(R.string.pickup_code);
-                txtOrderId.setText(pickupCode);
-            }
+        }
+        if (pickupCode != null) {
+            ((TextView) findViewById(R.id.txtOrderIdLabel)).setText(R.string.pickup_code);
+            txtOrderId.setText(pickupCode);
         }
 
         long deadline = getIntent().getLongExtra(EXTRA_DEADLINE, 0);
