@@ -275,4 +275,13 @@
     <string name="cancel_done_paid">Reservation cancelled. Your refund is on its way.</string>
     <string name="cancel_failed">Couldn\'t cancel the reservation. Please try again.</string>
     <string name="no_maps_app">No maps app found</string>
+    <!-- Reservations list -->
+    <string name="status_awaiting_payment">Awaiting payment</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="reservation_number">Reservation #%1$s</string>
+    <string name="reserved_on">Reserved on %1$s</string>
+    <string name="pick_up_before">Pick up before %1$s</string>
+    <string name="items_preview_line">%1$dx %2$s</string>
+    <string name="available_for_pickup">Available for pickup</string>
+    <string name="reservations_load_failed">Couldn\'t load your reservations.</string>
 </resources>
