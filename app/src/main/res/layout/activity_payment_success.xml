@@ -33,6 +33,7 @@
         </FrameLayout>
 
         <TextView
+            android:id="@+id/txtSuccessTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
@@ -73,6 +74,7 @@
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:id="@+id/txtOrderIdLabel"
                         android:layout_weight="1"
                         android:text="@string/order_id"
                         android:textColor="@color/text_secondary"
@@ -96,6 +98,7 @@
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:id="@+id/txtAmountLabel"
                         android:layout_weight="1"
                         android:text="@string/amount_paid"
                         android:textColor="@color/text_secondary"

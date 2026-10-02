@@ -15,6 +15,9 @@ public class PaymentSuccessActivity extends AppCompatActivity {
     public static final String EXTRA_ORDER_ID = "order_id";
     public static final String EXTRA_AMOUNT = "amount";
     public static final String EXTRA_STORE_NAME = "store_name";
+    public static final String EXTRA_PAY_AT_PICKUP = "pay_at_pickup";
+    public static final String EXTRA_PICKUP_CODE = "pickup_code";
+    public static final String EXTRA_DEADLINE = "deadline";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +35,31 @@ public class PaymentSuccessActivity extends AppCompatActivity {
         TextView txtStore = findViewById(R.id.txtStore);
         TextView txtDeadline = findViewById(R.id.txtDeadline);
 
+        boolean payAtPickup = getIntent().getBooleanExtra(EXTRA_PAY_AT_PICKUP, false);
+        String pickupCode = getIntent().getStringExtra(EXTRA_PICKUP_CODE);
+
         txtOrderId.setText(orderId != null ? orderId : "N/A");
         txtAmount.setText(String.format(Locale.getDefault(), "€%.2f", amount));
         txtStore.setText(storeName != null ? storeName : "N/A");
 
-        // Calculate deadline (48 hours from now)
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.HOUR, 48);
+        if (payAtPickup) {
+            ((TextView) findViewById(R.id.txtSuccessTitle)).setText(R.string.reserved_title);
+            ((TextView) findViewById(R.id.txtConfirmationMessage)).setText(R.string.reserved_pickup_message);
+            ((TextView) findViewById(R.id.txtAmountLabel)).setText(R.string.pay_at_pickup_amount);
+            if (pickupCode != null) {
+                ((TextView) findViewById(R.id.txtOrderIdLabel)).setText(R.string.pickup_code);
+                txtOrderId.setText(pickupCode);
+            }
+        }
+
+        long deadline = getIntent().getLongExtra(EXTRA_DEADLINE, 0);
+        if (deadline == 0) {
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.HOUR, 48);
+            deadline = cal.getTimeInMillis();
+        }
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy h:mm a", Locale.getDefault());
-        txtDeadline.setText(sdf.format(cal.getTime()));
+        txtDeadline.setText(sdf.format(deadline));
 
         // View Reservations button
         findViewById(R.id.btnViewReservations).setOnClickListener(v -> {
