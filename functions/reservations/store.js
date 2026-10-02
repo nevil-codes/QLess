@@ -5,6 +5,7 @@
 const {
   CARD_HOLD_HOURS, HOUR_MS, ReservationError, parseRequest, pickupCode, planReservations, releaseStock,
 } = require("./plan");
+const { toCents } = require("./lifecycle");
 
 const CODE_ATTEMPTS = 10;
 
@@ -124,10 +125,6 @@ async function markPaid(db, reservationIds, paymentIntentId, now = Date.now()) {
     }
     return updated;
   });
-}
-
-function toCents(amount) {
-  return Math.round(amount * 100);
 }
 
 // { items, paymentMethod } -> { reservations, paymentIntentId?, clientSecret? }
