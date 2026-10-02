@@ -3,6 +3,15 @@ plugins {
     alias(libs.plugins.google.services)
 }
 
+// Stripe publishable key from local.properties (not committed). Empty when
+// missing, which disables card payments in the app.
+def localProps = new Properties()
+def localPropsFile = rootProject.file('local.properties')
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProps.load(it) }
+}
+def stripePublishableKey = localProps.getProperty('STRIPE_PUBLISHABLE_KEY', '')
+
 android {
     namespace 'com.example.qless'
     compileSdk {
@@ -17,6 +26,12 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "STRIPE_PUBLISHABLE_KEY", "\"${stripePublishableKey}\""
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     buildTypes {
