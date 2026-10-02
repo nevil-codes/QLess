@@ -3,7 +3,7 @@
 // interleave with another checkout.
 
 const {
-  ReservationError, parseRequest, pickupCode, planReservations, releaseStock,
+  CARD_HOLD_HOURS, HOUR_MS, ReservationError, parseRequest, pickupCode, planReservations, releaseStock,
 } = require("./plan");
 
 const CODE_ATTEMPTS = 10;
@@ -102,6 +102,30 @@ async function cancelPending(db, reservationIds, now = Date.now()) {
   });
 }
 
+// Stripe confirmed the payment: reservations become reserved and the 48h
+// pickup window starts now (not when checkout began). Only pending
+// reservations change, so replayed webhooks are harmless.
+async function markPaid(db, reservationIds, paymentIntentId, now = Date.now()) {
+  if (!reservationIds.length) return 0;
+  return db.runTransaction(async (tx) => {
+    const snaps = await tx.getAll(...reservationIds.map((id) => db.doc(`reservations/${id}`)));
+    let updated = 0;
+    for (const snap of snaps) {
+      if (!snap.exists) continue;
+      const r = snap.data();
+      if (r.status !== "pending_payment" || r.paymentIntentId !== paymentIntentId) continue;
+      tx.update(snap.ref, {
+        status: "reserved",
+        paymentStatus: "paid",
+        paidAt: now,
+        pickupDeadline: now + CARD_HOLD_HOURS * HOUR_MS,
+      });
+      updated += 1;
+    }
+    return updated;
+  });
+}
+
 function toCents(amount) {
   return Math.round(amount * 100);
 }
@@ -167,4 +191,4 @@ async function cancelPendingPayment(db, uid, data, { stripe, now = Date.now() } 
   return { cancelled, paid: false };
 }
 
-module.exports = { createReservations, cancelPending, cancelPendingPayment };
+module.exports = { createReservations, cancelPending, cancelPendingPayment, markPaid };
