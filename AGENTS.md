@@ -37,6 +37,11 @@ QLess is a smart shopping app that helps users:
 - **Database**: Cloud Firestore
 - **Storage**: Firebase Storage (product images)
 - **Location**: Google Play Services + OpenStreetMap Nominatim
+- **Reservations**: Cloud Functions in `functions/reservations` own the whole lifecycle; the app only reads reservations
+  - `createReservation`: server prices, stock hold, one reservation per store, Stripe PaymentIntent for card
+  - `stripeWebhook`: marks card reservations paid (48h window starts at payment)
+  - `cancelPendingPayment` / `cancelReservation`: shopper cancels; stock returned, prepaid refunded in full
+  - `expireReservations` (every 15 min): expires overdue reservations (pickup = missed-pickup strike, prepaid = 90% refund), cancels abandoned card checkouts, retries failed refunds
 - **ML**: Recommendation Cloud Functions in `functions/recs` (europe-west1); the app's `RecommendationEngine` is a thin client. See `docs/recommendations.md`
 
 ## Firebase Collections
@@ -50,6 +55,7 @@ QLess is a smart shopping app that helps users:
 | user_profiles | Recommendation profiles, written by Cloud Functions |
 | co_purchases | Products bought together, per product |
 | pickup_log | Marks reservations whose pickup was already recorded |
+| users.noShowCount | Missed pickups (server-written); 3 or more means prepay only |
 
 ## Build/Test Workflows (Gradle)
 ```bash
