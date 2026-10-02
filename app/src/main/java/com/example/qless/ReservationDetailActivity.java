@@ -119,7 +119,9 @@ public class ReservationDetailActivity extends AppCompatActivity {
         txtPickupCode.setText(text(snap.getString("pickupCode")));
         txtStoreName.setText(store);
         String address = snap.getString("storeAddress");
-        txtStoreAddress.setText(address == null || address.isEmpty() ? store : address);
+        boolean hasAddress = address != null && !address.isEmpty();
+        txtStoreAddress.setText(hasAddress ? address : "");
+        txtStoreAddress.setVisibility(hasAddress ? View.VISIBLE : View.GONE);
         txtTotalLabel.setText(paid ? R.string.total_paid : R.string.total_pay_at_pickup);
         txtTotal.setText(euro(snap.getDouble("total")));
         renderItems(snap.get("items"));
@@ -203,7 +205,8 @@ public class ReservationDetailActivity extends AppCompatActivity {
     }
 
     private void openDirections() {
-        String address = txtStoreAddress.getText().toString();
+        String address = txtStoreAddress.getVisibility() == View.VISIBLE
+                ? txtStoreAddress.getText().toString() : txtStoreName.getText().toString();
         Uri uri = Uri.parse("geo:0,0?q=" + Uri.encode(address));
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, uri));
