@@ -183,3 +183,14 @@ describe("cancelAbandoned", () => {
     expect((await res(s.reservationId)).status).toBe("pending_payment");
   });
 });
+
+test("the cancelReservation callable requires sign-in", async () => {
+  const host = process.env.FUNCTIONS_EMULATOR_HOST || "127.0.0.1:5001";
+  const project = process.env.GCLOUD_PROJECT || "demo-qless";
+  const res = await fetch(`http://${host}/${project}/europe-west1/cancelReservation`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data: { reservationId: "RES-1-x" } }),
+  });
+  expect((await res.json()).error.status).toBe("UNAUTHENTICATED");
+});
