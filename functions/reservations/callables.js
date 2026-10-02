@@ -1,12 +1,10 @@
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
-const { defineSecret } = require("firebase-functions/params");
 const { getFirestore } = require("firebase-admin/firestore");
 const Stripe = require("stripe");
 
 const { ReservationError } = require("./plan");
+const { STRIPE_SECRET_KEY } = require("./secrets");
 const { createReservations, cancelPendingPayment } = require("./store");
-
-const STRIPE_SECRET_KEY = defineSecret("STRIPE_SECRET_KEY");
 
 // invoker: "public" — see recs/callables.js; sign-in is enforced below.
 const OPTIONS = { invoker: "public", secrets: [STRIPE_SECRET_KEY] };
