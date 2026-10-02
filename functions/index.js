@@ -10,6 +10,7 @@ const triggers = require("./recs/triggers");
 const callables = require("./recs/callables");
 const reservations = require("./reservations/callables");
 const reservationsHttp = require("./reservations/http");
+const reservationsScheduled = require("./reservations/scheduled");
 
 exports.onUserEventCreated = triggers.onUserEventCreated;
 exports.onReservationUpdated = triggers.onReservationUpdated;
@@ -20,4 +21,6 @@ exports.getPeopleAlsoBuy = callables.getPeopleAlsoBuy;
 
 exports.createReservation = reservations.createReservation;
 exports.cancelPendingPayment = reservations.cancelPendingPayment;
+exports.cancelReservation = reservations.cancelReservation;
 exports.stripeWebhook = reservationsHttp.stripeWebhook;
+exports.expireReservations = reservationsScheduled.expireReservations;

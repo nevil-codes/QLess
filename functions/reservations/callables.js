@@ -5,6 +5,7 @@ const Stripe = require("stripe");
 const { ReservationError } = require("./plan");
 const { STRIPE_SECRET_KEY } = require("./secrets");
 const { createReservations, cancelPendingPayment } = require("./store");
+const { cancelReservation } = require("./lifecycleStore");
 
 // invoker: "public" — see recs/callables.js; sign-in is enforced below.
 const OPTIONS = { invoker: "public", secrets: [STRIPE_SECRET_KEY] };
@@ -24,3 +25,4 @@ function signedIn(handler) {
 
 exports.createReservation = signedIn(createReservations);
 exports.cancelPendingPayment = signedIn(cancelPendingPayment);
+exports.cancelReservation = signedIn(cancelReservation);
