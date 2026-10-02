@@ -1,11 +1,13 @@
 package com.example.qless;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +18,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.SimpleDateFormat;
@@ -26,6 +27,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Active (reserved or awaiting payment) and past (expired or cancelled)
+ * reservations. Picked-up ones live in OrdersActivity. Statuses come from
+ * the server, which expires reservations on time.
+ */
 public class ReservationsActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
@@ -33,10 +39,8 @@ public class ReservationsActivity extends AppCompatActivity {
     private LinearLayout emptyState;
     private TextView txtEmptyTitle, txtEmptyDesc;
 
-    private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
-    private List<Map<String, Object>> activeList = new ArrayList<>();
-    private List<Map<String, Object>> pastList = new ArrayList<>();
+    private final List<Map<String, Object>> activeList = new ArrayList<>();
+    private final List<Map<String, Object>> pastList = new ArrayList<>();
     private boolean showingActive = true;
 
     @Override
@@ -44,15 +48,6 @@ public class ReservationsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reservations);
 
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-
-        initViews();
-        setupTabs();
-        loadReservations();
-    }
-
-    private void initViews() {
         tabLayout = findViewById(R.id.tabLayout);
         rvReservations = findViewById(R.id.rvReservations);
         emptyState = findViewById(R.id.emptyState);
@@ -61,12 +56,18 @@ public class ReservationsActivity extends AppCompatActivity {
 
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         rvReservations.setLayoutManager(new LinearLayoutManager(this));
+        setupTabs();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        listenToReservations();
     }
 
     private void setupTabs() {
         tabLayout.addTab(tabLayout.newTab().setText(R.string.active_reservations));
         tabLayout.addTab(tabLayout.newTab().setText(R.string.past_reservations));
-
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -82,65 +83,40 @@ public class ReservationsActivity extends AppCompatActivity {
         });
     }
 
-    private void loadReservations() {
-        if (mAuth.getCurrentUser() == null) return;
+    // Activity-scoped listener: detached automatically in onStop.
+    private void listenToReservations() {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) return;
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        String userId = mAuth.getCurrentUser().getUid();
-
-        // Query without orderBy first to avoid needing composite index
-        db.collection("reservations")
+        FirebaseFirestore.getInstance().collection("reservations")
                 .whereEqualTo("userId", userId)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    activeList.clear();
-                    pastList.clear();
-
-                    long now = System.currentTimeMillis();
-
-                    List<Map<String, Object>> allReservations = new ArrayList<>();
-                    
-                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                .addSnapshotListener(this, (snap, e) -> {
+                    if (e != null || snap == null) {
+                        Log.e("ReservationsActivity", "Error loading reservations", e);
+                        Toast.makeText(this, R.string.reservations_load_failed, Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    List<Map<String, Object>> all = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : snap) {
                         Map<String, Object> reservation = doc.getData();
                         reservation.put("id", doc.getId());
-                        allReservations.add(reservation);
+                        all.add(reservation);
                     }
-                    
-                    // Sort by createdAt locally
-                    allReservations.sort((a, b) -> {
-                        long timeA = a.get("createdAt") != null ? ((Number) a.get("createdAt")).longValue() : 0;
-                        long timeB = b.get("createdAt") != null ? ((Number) b.get("createdAt")).longValue() : 0;
-                        return Long.compare(timeB, timeA); // Descending
-                    });
+                    all.sort((a, b) -> Long.compare(number(b.get("createdAt")), number(a.get("createdAt"))));
 
-                    for (Map<String, Object> reservation : allReservations) {
-                        String status = (String) reservation.get("status");
-                        
-                        if ("reserved".equals(status)) {
-                            // Check if expired
-                            Object deadline = reservation.get("pickupDeadline");
-                            if (deadline != null && ((Number) deadline).longValue() < now) {
-                                reservation.put("status", "expired");
-                                pastList.add(reservation);
-                            } else {
-                                activeList.add(reservation);
-                            }
-                        } else {
-                            pastList.add(reservation);
-                        }
+                    activeList.clear();
+                    pastList.clear();
+                    for (Map<String, Object> r : all) {
+                        String status = (String) r.get("status");
+                        if ("reserved".equals(status) || "pending_payment".equals(status)) activeList.add(r);
+                        else if ("expired".equals(status) || "cancelled".equals(status)) pastList.add(r);
                     }
-                    updateUI();
-                })
-                .addOnFailureListener(e -> {
-                    android.util.Log.e("ReservationsActivity", "Error loading reservations", e);
-                    android.widget.Toast.makeText(this, "Error loading reservations: " + e.getMessage(), 
-                            android.widget.Toast.LENGTH_LONG).show();
                     updateUI();
                 });
     }
 
     private void updateUI() {
         List<Map<String, Object>> currentList = showingActive ? activeList : pastList;
-
         if (currentList.isEmpty()) {
             emptyState.setVisibility(View.VISIBLE);
             rvReservations.setVisibility(View.GONE);
@@ -151,6 +127,10 @@ public class ReservationsActivity extends AppCompatActivity {
             rvReservations.setVisibility(View.VISIBLE);
             rvReservations.setAdapter(new ReservationsAdapter(currentList));
         }
+    }
+
+    private static long number(Object value) {
+        return value instanceof Number ? ((Number) value).longValue() : 0;
     }
 
     private class ReservationsAdapter extends RecyclerView.Adapter<ReservationsAdapter.VH> {
@@ -168,77 +148,71 @@ public class ReservationsActivity extends AppCompatActivity {
             return new VH(v);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void onBindViewHolder(@NonNull VH holder, int position) {
             Map<String, Object> res = reservations.get(position);
-
-            String resId = (String) res.get("reservationId");
-            holder.txtReservationId.setText("Reservation #" + (resId != null ? resId.substring(4, Math.min(resId.length(), 16)) : ""));
-
-            Object createdAt = res.get("createdAt");
-            if (createdAt != null) {
-                long ts = ((Number) createdAt).longValue();
-                SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
-                holder.txtReservedDate.setText("Reserved on " + sdf.format(new Date(ts)));
-            }
-
+            String id = (String) res.get("id");
             String status = (String) res.get("status");
-            holder.txtStatus.setText(getStatusText(status));
-            holder.txtStatus.setBackgroundResource(getStatusBackground(status));
-            holder.txtStatus.setTextColor(getResources().getColor(getStatusTextColor(status), null));
+            boolean paid = "card".equals(res.get("paymentMethod"));
+
+            String code = (String) res.get("pickupCode");
+            holder.txtReservationId.setText(code != null ? code : getString(R.string.reservation_number,
+                    id != null ? id.substring(4, Math.min(id.length(), 16)) : ""));
+
+            SimpleDateFormat day = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
+            holder.txtReservedDate.setText(getString(R.string.reserved_on, day.format(new Date(number(res.get("createdAt"))))));
+
+            holder.txtStatus.setText(statusText(status));
+            holder.txtStatus.setBackgroundResource(statusBackground(status));
+            holder.txtStatus.setTextColor(getColor(statusTextColor(status)));
 
             holder.txtStoreName.setText((String) res.get("storeName"));
-            holder.txtStoreAddress.setText("Available for pickup");
+            String address = (String) res.get("storeAddress");
+            holder.txtStoreAddress.setText(address != null && !address.isEmpty() ? address : getString(R.string.available_for_pickup));
 
-            Object deadline = res.get("pickupDeadline");
-            if (deadline != null) {
-                long ts = ((Number) deadline).longValue();
-                SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy h:mm a", Locale.getDefault());
-                holder.txtPickupDeadline.setText("Pick up before " + sdf.format(new Date(ts)));
-            }
+            SimpleDateFormat time = new SimpleDateFormat("MMMM dd, yyyy h:mm a", Locale.getDefault());
+            holder.txtPickupDeadline.setText(getString(R.string.pick_up_before, time.format(new Date(number(res.get("pickupDeadline"))))));
 
-            // Build items preview
-            List<Map<String, Object>> items = (List<Map<String, Object>>) res.get("items");
-            if (items != null) {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < Math.min(items.size(), 3); i++) {
-                    Map<String, Object> item = items.get(i);
-                    if (sb.length() > 0) sb.append(", ");
-                    sb.append(((Number) item.get("quantity")).intValue()).append("x ");
-                    sb.append(item.get("productName"));
+            StringBuilder preview = new StringBuilder();
+            Object items = res.get("items");
+            if (items instanceof List) {
+                List<Map<String, Object>> list = (List<Map<String, Object>>) items;
+                for (int i = 0; i < Math.min(list.size(), 3); i++) {
+                    if (preview.length() > 0) preview.append(", ");
+                    preview.append(getString(R.string.items_preview_line,
+                            (int) number(list.get(i).get("quantity")), list.get(i).get("productName")));
                 }
-                holder.txtItemsPreview.setText(sb.toString());
             }
+            holder.txtItemsPreview.setText(preview.toString());
 
+            holder.txtAmountLabel.setText(paid ? R.string.amount_paid : R.string.amount_to_pay);
             Object total = res.get("total");
-            if (total != null) {
-                holder.txtTotal.setText(String.format(Locale.getDefault(), "€%.2f", ((Number) total).doubleValue()));
-            }
+            holder.txtTotal.setText(String.format(Locale.getDefault(), "€%.2f",
+                    total instanceof Number ? ((Number) total).doubleValue() : 0));
 
-            // Hide action button for past reservations
-            if (!"reserved".equals(status)) {
-                holder.btnAction.setVisibility(View.GONE);
-            }
+            boolean active = "reserved".equals(status) || "pending_payment".equals(status);
+            holder.btnAction.setVisibility(active ? View.VISIBLE : View.GONE);
+            View.OnClickListener open = v -> startActivity(ReservationDetailActivity.intent(ReservationsActivity.this, id));
+            holder.btnAction.setOnClickListener(open);
+            holder.itemView.setOnClickListener(open);
         }
 
-        private String getStatusText(String status) {
-            if (status == null) return "";
-            switch (status) {
-                case "reserved": return "RESERVED";
-                case "picked_up": return "PICKED UP";
-                case "expired": return "EXPIRED";
-                case "cancelled": return "CANCELLED";
-                default: return status.toUpperCase();
-            }
+        private int statusText(String status) {
+            if ("pending_payment".equals(status)) return R.string.status_awaiting_payment;
+            if ("picked_up".equals(status)) return R.string.status_picked_up;
+            if ("expired".equals(status)) return R.string.status_expired;
+            if ("cancelled".equals(status)) return R.string.status_cancelled;
+            return R.string.status_reserved;
         }
 
-        private int getStatusBackground(String status) {
+        private int statusBackground(String status) {
             if ("picked_up".equals(status)) return R.drawable.bg_badge_success_container;
             if ("expired".equals(status) || "cancelled".equals(status)) return R.drawable.bg_status_badge_muted;
             return R.drawable.bg_status_badge;
         }
 
-        private int getStatusTextColor(String status) {
+        private int statusTextColor(String status) {
             if ("picked_up".equals(status)) return R.color.success;
             if ("expired".equals(status) || "cancelled".equals(status)) return R.color.text_tertiary;
             return R.color.on_primary_container;
@@ -252,7 +226,7 @@ public class ReservationsActivity extends AppCompatActivity {
         class VH extends RecyclerView.ViewHolder {
             TextView txtReservationId, txtReservedDate, txtStatus;
             TextView txtStoreName, txtStoreAddress, txtPickupDeadline;
-            TextView txtItemsPreview, txtTotal;
+            TextView txtItemsPreview, txtAmountLabel, txtTotal;
             MaterialButton btnAction;
 
             VH(View v) {
@@ -264,10 +238,10 @@ public class ReservationsActivity extends AppCompatActivity {
                 txtStoreAddress = v.findViewById(R.id.txtStoreAddress);
                 txtPickupDeadline = v.findViewById(R.id.txtPickupDeadline);
                 txtItemsPreview = v.findViewById(R.id.txtItemsPreview);
+                txtAmountLabel = v.findViewById(R.id.txtAmountLabel);
                 txtTotal = v.findViewById(R.id.txtTotal);
                 btnAction = v.findViewById(R.id.btnAction);
             }
         }
     }
 }
-
