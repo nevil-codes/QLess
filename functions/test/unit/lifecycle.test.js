@@ -1,11 +1,20 @@
 const {
-  ABANDONED_CHECKOUT_MS, isAbandonedCheckout, planCancel, planExpiry, toCents,
+  ABANDONED_CHECKOUT_MS, isAbandonedCheckout, isRealPayment, planCancel, planExpiry, toCents,
 } = require("../../reservations/lifecycle");
 const { ReservationError } = require("../../reservations/plan");
 
 const NOW = Date.UTC(2026, 9, 2, 12);
 const pickup = { userId: "u1", status: "reserved", paymentMethod: "pickup", total: 9.99, pickupDeadline: NOW - 1 };
-const card = { userId: "u1", status: "reserved", paymentMethod: "card", total: 10.98, pickupDeadline: NOW - 1 };
+const card = {
+  userId: "u1", status: "reserved", paymentMethod: "card", paymentStatus: "paid",
+  paymentIntentId: "pi_3UM3abD1rLrjfLjn0S25xqd5", total: 10.98, pickupDeadline: NOW - 1,
+};
+// Shapes found in production from before payment methods / Stripe existed.
+const legacyNoMethod = { userId: "u1", status: "reserved", total: 5, pickupDeadline: NOW - 1 };
+const legacySimulated = {
+  userId: "u1", status: "reserved", paymentMethod: "card", paymentStatus: "paid",
+  paymentIntentId: "pi_simulated_1773272757673", total: 5, pickupDeadline: NOW - 1,
+};
 
 describe("toCents", () => {
   test("avoids floating point drift", () => {
@@ -29,6 +38,12 @@ describe("planExpiry", () => {
       finalPaymentStatus: "partially_refunded",
       noShow: false,
     });
+  });
+
+  test("legacy reservations just expire: no strike, no refund", () => {
+    for (const r of [legacyNoMethod, legacySimulated]) {
+      expect(planExpiry(r, NOW)).toEqual({ update: { status: "expired", expiredAt: NOW }, refundCents: 0, noShow: false });
+    }
   });
 
   test("leaves reservations that aren't due or aren't reserved", () => {
@@ -56,6 +71,12 @@ describe("planCancel", () => {
     });
   });
 
+  test("legacy simulated payment: cancelled without a refund", () => {
+    expect(planCancel(live(legacySimulated), "u1", NOW)).toEqual({
+      update: { status: "cancelled", cancelledAt: NOW }, refundCents: 0,
+    });
+  });
+
   test.each([
     ["someone else's reservation", live(pickup), "u2", "not-found"],
     ["missing reservation", null, "u1", "not-found"],
@@ -65,6 +86,15 @@ describe("planCancel", () => {
   ])("rejects %s", (_, reservation, uid, code) => {
     expect(() => planCancel(reservation, uid, NOW)).toThrow(ReservationError);
     try { planCancel(reservation, uid, NOW); } catch (err) { expect(err.code).toBe(code); }
+  });
+});
+
+describe("isRealPayment", () => {
+  test("only paid reservations with a real Stripe PaymentIntent", () => {
+    expect(isRealPayment(card)).toBe(true);
+    expect(isRealPayment(legacySimulated)).toBe(false);
+    expect(isRealPayment({ ...card, paymentStatus: "pending" })).toBe(false);
+    expect(isRealPayment({ ...card, paymentIntentId: undefined })).toBe(false);
   });
 });
 

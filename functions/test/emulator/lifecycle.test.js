@@ -67,13 +67,13 @@ describe("expireDue", () => {
 
   test("prepaid not collected: expired and refunded 90%, no strike", async () => {
     const s = await seed("prepaid", {
-      status: "reserved", paymentMethod: "card", paymentStatus: "paid", paymentIntentId: `pi_${tag}_a`,
+      status: "reserved", paymentMethod: "card", paymentStatus: "paid", paymentIntentId: `pi_${tag}a`,
       total: 10.98, pickupDeadline: NOW - 1,
     });
     const stripe = fakeStripe();
     await expireDue(db, { stripe, now: NOW });
 
-    const refundCall = stripe.calls.refunds.find((r) => r.payment_intent === `pi_${tag}_a`);
+    const refundCall = stripe.calls.refunds.find((r) => r.payment_intent === `pi_${tag}a`);
     expect(refundCall).toMatchObject({ amount: 988, key: `refund-${s.reservationId}` });
     expect(await res(s.reservationId)).toMatchObject({
       status: "expired", paymentStatus: "partially_refunded", refundCents: 988,
@@ -96,7 +96,7 @@ describe("expireDue", () => {
 describe("refund retries", () => {
   test("a failed refund stays pending and is retried with the same idempotency key", async () => {
     const s = await seed("retry", {
-      status: "reserved", paymentMethod: "card", paymentStatus: "paid", paymentIntentId: `pi_${tag}_r`,
+      status: "reserved", paymentMethod: "card", paymentStatus: "paid", paymentIntentId: `pi_${tag}r`,
       total: 5, pickupDeadline: NOW - 1,
     });
     const down = fakeStripe({ refundFails: true });
@@ -107,9 +107,38 @@ describe("refund retries", () => {
 
     const up = fakeStripe();
     await retryRefunds(db, { stripe: up });
-    const retried = up.calls.refunds.find((r) => r.payment_intent === `pi_${tag}_r`);
+    const retried = up.calls.refunds.find((r) => r.payment_intent === `pi_${tag}r`);
     expect(retried).toMatchObject({ amount: 450, key: `refund-${s.reservationId}` });
     expect((await res(s.reservationId)).paymentStatus).toBe("partially_refunded");
+  });
+});
+
+describe("legacy reservations", () => {
+  test("pre-rework reservations expire without strikes or refund attempts", async () => {
+    const noMethod = await seed("legacyplain", { status: "reserved", total: 4, pickupDeadline: NOW - 1 });
+    const simulated = await seed("legacysim", {
+      status: "reserved", paymentMethod: "card", paymentStatus: "paid",
+      paymentIntentId: "pi_simulated_1773272757673", total: 4, pickupDeadline: NOW - 1,
+    });
+    const stripe = fakeStripe();
+    await expireDue(db, { stripe, now: NOW });
+
+    for (const s of [noMethod, simulated]) {
+      expect((await res(s.reservationId)).status).toBe("expired");
+      expect((await db.doc(`users/${s.userId}`).get()).exists).toBe(false);
+    }
+    expect(stripe.calls.refunds.find((r) => r.payment_intent === "pi_simulated_1773272757673")).toBeUndefined();
+  });
+
+  test("a stuck refund for a simulated payment stops retrying", async () => {
+    const s = await seed("stuck", {
+      status: "expired", paymentMethod: "card", paymentStatus: "refund_pending", refundCents: 450,
+      refundTargetStatus: "partially_refunded", paymentIntentId: "pi_simulated_1", total: 5, pickupDeadline: NOW - H,
+    });
+    const stripe = fakeStripe();
+    await retryRefunds(db, { stripe });
+    expect((await res(s.reservationId)).paymentStatus).toBe("not_refundable");
+    expect(stripe.calls.refunds.find((r) => r.payment_intent === "pi_simulated_1")).toBeUndefined();
   });
 });
 
@@ -126,14 +155,14 @@ describe("cancelReservation", () => {
 
   test("card: full refund including the fee", async () => {
     const s = await seed("cancelcard", {
-      status: "reserved", paymentMethod: "card", paymentStatus: "paid", paymentIntentId: `pi_${tag}_c`,
+      status: "reserved", paymentMethod: "card", paymentStatus: "paid", paymentIntentId: `pi_${tag}c`,
       total: 10.98, pickupDeadline: NOW + H,
     });
     const stripe = fakeStripe();
     const out = await cancelReservation(db, s.userId, { reservationId: s.reservationId }, { stripe, now: NOW });
     expect(out).toEqual({ status: "cancelled", refundCents: 1098, refundStatus: "refunded" });
     expect(stripe.calls.refunds).toEqual([
-      { payment_intent: `pi_${tag}_c`, amount: 1098, key: `refund-${s.reservationId}` },
+      { payment_intent: `pi_${tag}c`, amount: 1098, key: `refund-${s.reservationId}` },
     ]);
     expect((await res(s.reservationId)).paymentStatus).toBe("refunded");
   });
@@ -156,17 +185,17 @@ describe("cancelAbandoned", () => {
   test("cancels stale pending checkouts and returns stock", async () => {
     const stale = await seed("stale", {
       status: "pending_payment", paymentMethod: "card", paymentStatus: "pending",
-      paymentIntentId: `pi_${tag}_stale`, total: 4, pickupDeadline: NOW + 47 * H, createdAt: NOW - 31 * 60000,
+      paymentIntentId: `pi_${tag}stale`, total: 4, pickupDeadline: NOW + 47 * H, createdAt: NOW - 31 * 60000,
     });
     const fresh = await seed("fresh", {
       status: "pending_payment", paymentMethod: "card", paymentStatus: "pending",
-      paymentIntentId: `pi_${tag}_fresh`, total: 4, pickupDeadline: NOW + 47 * H, createdAt: NOW - 60000,
+      paymentIntentId: `pi_${tag}fresh`, total: 4, pickupDeadline: NOW + 47 * H, createdAt: NOW - 60000,
     });
     const stripe = fakeStripe();
     await cancelAbandoned(db, { stripe, now: NOW });
 
-    expect(stripe.calls.cancels).toContain(`pi_${tag}_stale`);
-    expect(stripe.calls.cancels).not.toContain(`pi_${tag}_fresh`);
+    expect(stripe.calls.cancels).toContain(`pi_${tag}stale`);
+    expect(stripe.calls.cancels).not.toContain(`pi_${tag}fresh`);
     expect((await res(stale.reservationId)).status).toBe("cancelled");
     expect(await stock(stale.productId)).toBe(5);
     expect((await res(fresh.reservationId)).status).toBe("pending_payment");
@@ -175,11 +204,11 @@ describe("cancelAbandoned", () => {
   test("a payment that went through is left for the webhook", async () => {
     const s = await seed("latepaid", {
       status: "pending_payment", paymentMethod: "card", paymentStatus: "pending",
-      paymentIntentId: `pi_${tag}_late`, total: 4, pickupDeadline: NOW + 47 * H, createdAt: NOW - 31 * 60000,
+      paymentIntentId: `pi_${tag}late`, total: 4, pickupDeadline: NOW + 47 * H, createdAt: NOW - 31 * 60000,
     });
     const stripe = fakeStripe({ intentStatus: "succeeded" });
     await cancelAbandoned(db, { stripe, now: NOW });
-    expect(stripe.calls.cancels).not.toContain(`pi_${tag}_late`);
+    expect(stripe.calls.cancels).not.toContain(`pi_${tag}late`);
     expect((await res(s.reservationId)).status).toBe("pending_payment");
   });
 });
