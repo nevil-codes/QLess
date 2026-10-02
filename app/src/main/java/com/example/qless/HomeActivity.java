@@ -117,23 +117,69 @@ public class HomeActivity extends AppCompatActivity {
         // Bottom Navigation
         com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.nav_home);
+        // Other tabs open their own screen; returning false keeps Home
+        // highlighted when the user comes back.
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_home) return true;
-            if (id == R.id.nav_search) {
-                startActivity(new Intent(this, SearchActivity.class));
-                return true;
-            }
-            if (id == R.id.nav_cart) {
-                startActivity(new Intent(this, CartActivity.class));
-                return true;
-            }
-            if (id == R.id.nav_profile) {
-                startActivity(new Intent(this, ProfileActivity.class));
-                return true;
-            }
+            if (id == R.id.nav_search) startActivity(new Intent(this, SearchActivity.class));
+            else if (id == R.id.nav_cart) startActivity(new Intent(this, CartActivity.class));
+            else if (id == R.id.nav_pickups) startActivity(new Intent(this, ReservationsActivity.class));
+            else if (id == R.id.nav_profile) startActivity(new Intent(this, ProfileActivity.class));
             return false;
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        listenToActiveReservations();
+    }
+
+    // "1 reservation ready · FreshHub · collect within 47 h" card. The
+    // listener is activity-scoped, so it detaches in onStop.
+    private void listenToActiveReservations() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        View card = findViewById(R.id.activeReservationCard);
+        if (user == null) {
+            card.setVisibility(View.GONE);
+            return;
+        }
+        db.collection("reservations")
+                .whereEqualTo("userId", user.getUid())
+                .whereEqualTo("status", "reserved")
+                .addSnapshotListener(this, (snap, e) -> {
+                    if (snap == null || snap.isEmpty()) {
+                        card.setVisibility(View.GONE);
+                        return;
+                    }
+                    DocumentSnapshot soonest = null;
+                    for (DocumentSnapshot doc : snap.getDocuments()) {
+                        Long deadline = doc.getLong("pickupDeadline");
+                        if (deadline == null) continue;
+                        if (soonest == null || deadline < soonest.getLong("pickupDeadline")) soonest = doc;
+                    }
+                    if (soonest == null) {
+                        card.setVisibility(View.GONE);
+                        return;
+                    }
+                    int count = snap.size();
+                    long left = Math.max(0, soonest.getLong("pickupDeadline") - System.currentTimeMillis());
+                    long hours = left / 3_600_000;
+                    String timeLeft = hours > 0
+                            ? getString(R.string.time_left_hours, (int) hours)
+                            : getString(R.string.time_left_minutes, (int) (left / 60_000));
+
+                    ((TextView) findViewById(R.id.txtActiveTitle))
+                            .setText(getResources().getQuantityString(R.plurals.reservations_ready, count, count));
+                    ((TextView) findViewById(R.id.txtActiveSubtitle)).setText(getString(
+                            R.string.active_reservation_subtitle, soonest.getString("storeName"), timeLeft));
+                    String onlyId = soonest.getId();
+                    card.setOnClickListener(v -> startActivity(count == 1
+                            ? ReservationDetailActivity.intent(this, onlyId)
+                            : new Intent(this, ReservationsActivity.class)));
+                    card.setVisibility(View.VISIBLE);
+                });
     }
 
     private void loadUserGreeting() {
