@@ -1,7 +1,7 @@
 // Writes reservations in one transaction so stock checks, stock holds and
 // the reservation docs can't interleave with another checkout.
 
-const { parseRequest, pickupCode, planPickupReservations } = require("./plan");
+const { ReservationError, parseRequest, pickupCode, planReservations } = require("./plan");
 
 const CODE_ATTEMPTS = 10;
 
@@ -20,6 +20,9 @@ async function uniquePickupCode(tx, db, storeId, random) {
 
 async function createPickupReservations(db, uid, data, { now = Date.now(), random = Math.random } = {}) {
   const lines = parseRequest(data);
+  if (data.paymentMethod !== "pickup") {
+    throw new ReservationError("unimplemented", "Card payments are not available yet.");
+  }
   const productIds = [...new Set(lines.map((l) => l.productId))];
   const storeIds = [...new Set(lines.map((l) => l.storeId))];
 
@@ -40,8 +43,9 @@ async function createPickupReservations(db, uid, data, { now = Date.now(), rando
       ids[storeId] = `RES-${now}-${db.collection("reservations").doc().id.slice(0, 6)}`;
     }
 
-    const { reservations, newPrices } = planPickupReservations({
+    const { reservations, newPrices } = planReservations({
       uid,
+      paymentMethod: "pickup",
       lines,
       products: byId(productSnaps),
       stores: byId(storeSnaps),

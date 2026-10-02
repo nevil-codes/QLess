@@ -1,5 +1,5 @@
 const {
-  HOUR_MS, ReservationError, parseRequest, pickupCode, planPickupReservations,
+  CARD_SERVICE_FEE, HOUR_MS, ReservationError, parseRequest, pickupCode, planReservations, releaseStock,
 } = require("../../reservations/plan");
 
 const NOW = Date.UTC(2026, 9, 1, 12);
@@ -21,8 +21,8 @@ const stores = {
 };
 
 function plan(lines, extra = {}) {
-  return planPickupReservations({
-    uid: "u1", lines, products, stores, user: { noShowCount: 0 },
+  return planReservations({
+    uid: "u1", paymentMethod: "pickup", lines, products, stores, user: { noShowCount: 0 },
     codes: { s1: "QL·0001", s2: "QL·0002" }, ids: { s1: "RES-1", s2: "RES-2" }, now: NOW,
     ...extra,
   });
@@ -59,7 +59,7 @@ describe("parseRequest", () => {
   test.each([
     [{}, "empty"],
     [{ paymentMethod: "pickup", items: [] }, "no items"],
-    [{ paymentMethod: "card", items: [{ productId: "a", storeId: "s", quantity: 1 }] }, "card"],
+    [{ paymentMethod: "cash", items: [{ productId: "a", storeId: "s", quantity: 1 }] }, "unknown method"],
     [{ paymentMethod: "pickup", items: [{ productId: "a", quantity: 1 }] }, "no store"],
     [{ paymentMethod: "pickup", items: [{ productId: "a/b", storeId: "s", quantity: 1 }] }, "bad id"],
     [{ paymentMethod: "pickup", items: [{ productId: "a", storeId: "s", quantity: 0 }] }, "zero"],
@@ -80,7 +80,7 @@ describe("pickupCode", () => {
   });
 });
 
-describe("planPickupReservations", () => {
+describe("planReservations (pay at pickup)", () => {
   test("one reservation per store, priced from the catalog with no fee", () => {
     const { reservations } = plan([
       { productId: "milk", storeId: "s1", quantity: 2 },
@@ -135,5 +135,56 @@ describe("planPickupReservations", () => {
   test("ignores a client-claimed price; only the catalog price counts", () => {
     const { reservations } = plan([{ productId: "milk", storeId: "s1", quantity: 1, price: 0.01 }]);
     expect(reservations[0].total).toBe(1.19);
+  });
+});
+
+describe("planReservations (card)", () => {
+  const lines = [
+    { productId: "milk", storeId: "s1", quantity: 2 },
+    { productId: "milk", storeId: "s2", quantity: 1 },
+  ];
+
+  test("pending until paid, 48h hold, one service fee per checkout", () => {
+    const { reservations } = plan(lines, { paymentMethod: "card" });
+    expect(reservations.map((r) => [r.status, r.paymentStatus, r.paymentMethod])).toEqual([
+      ["pending_payment", "pending", "card"], ["pending_payment", "pending", "card"],
+    ]);
+    expect(reservations.map((r) => r.serviceFee)).toEqual([CARD_SERVICE_FEE, 0]);
+    expect(reservations[0].total).toBe(3.37);
+    expect(reservations[1].total).toBe(1.39);
+    expect(reservations[0].pickupDeadline - NOW).toBe(48 * HOUR_MS);
+  });
+
+  test("prepaying is allowed after 3 missed pickups", () => {
+    expect(() => plan(lines, { paymentMethod: "card", user: { noShowCount: 5 } })).not.toThrow();
+  });
+
+  test("still holds stock", () => {
+    const { newPrices } = plan(lines, { paymentMethod: "card" });
+    expect(newPrices.milk.map((p) => p.quantity)).toEqual([3, 0]);
+  });
+});
+
+describe("releaseStock", () => {
+  test("puts each item's quantity back in its store", () => {
+    const reservation = {
+      items: [
+        { productId: "milk", storeId: "s1", quantity: 2 },
+        { productId: "bread", storeId: "s1", quantity: 1 },
+        { productId: "deleted", storeId: "s1", quantity: 1 },
+      ],
+    };
+    const newPrices = releaseStock(reservation, products);
+    expect(newPrices.milk.map((p) => p.quantity)).toEqual([7, 1]);
+    expect(newPrices.bread[0].quantity).toBe(4);
+    expect(newPrices).not.toHaveProperty("deleted");
+    expect(products.milk.prices[0].quantity).toBe(5);
+  });
+
+  test("hold then release restores the original stock", () => {
+    const line = [{ productId: "milk", storeId: "s1", quantity: 3 }];
+    const { reservations, newPrices } = plan(line);
+    const held = { ...products, milk: { ...products.milk, prices: newPrices.milk } };
+    expect(releaseStock(reservations[0], held).milk[0].quantity).toBe(5);
   });
 });
