@@ -241,4 +241,38 @@
     <!-- Colors for Status -->
     <string name="warning">Warning</string>
     <string name="error">Error</string>
+    <!-- Reservation detail -->
+    <string name="close">Close</string>
+    <string name="pickup_code_label">PICKUP CODE</string>
+    <string name="collect_within">Collect within</string>
+    <string name="get_directions">Get directions</string>
+    <string name="cancel_reservation">Cancel reservation</string>
+    <string name="reserved_at">Reserved at %1$s</string>
+    <string name="detail_subtitle_pickup">Show this code at the counter and pay there.</string>
+    <string name="detail_subtitle_paid">Show this code at the counter. It\'s already paid.</string>
+    <string name="confirming_payment">Confirming your payment…</string>
+    <string name="confirming_payment_desc">This usually takes a few seconds.</string>
+    <string name="reservation_picked_up">Picked up</string>
+    <string name="reservation_picked_up_desc">Thanks for shopping with QLess.</string>
+    <string name="reservation_expired">Reservation expired</string>
+    <string name="reservation_expired_desc_pickup">It wasn\'t collected in time, so it counts as a missed pickup.</string>
+    <string name="reservation_expired_desc_paid">It wasn\'t collected in time. You\'ve been refunded minus a 10% fee.</string>
+    <string name="reservation_cancelled">Reservation cancelled</string>
+    <string name="reservation_cancelled_desc_pickup">The items are back on the shelf.</string>
+    <string name="reservation_cancelled_desc_paid">You\'ve been refunded in full.</string>
+    <string name="total_pay_at_pickup">Pay at pickup</string>
+    <string name="total_paid">Paid</string>
+    <string name="countdown_hours_minutes">%1$d h %2$d min</string>
+    <string name="countdown_minutes">%1$d min</string>
+    <string name="held_until">Held until %1$s</string>
+    <string name="line_with_quantity">%1$s × %2$d</string>
+    <string name="cancel_confirm_title">Cancel this reservation?</string>
+    <string name="cancel_confirm_pickup">The items go back on the shelf. This doesn\'t count as a missed pickup.</string>
+    <string name="cancel_confirm_paid">You\'ll get a full refund of %1$s.</string>
+    <string name="cancel_confirm_yes">Cancel reservation</string>
+    <string name="cancel_confirm_no">Keep it</string>
+    <string name="cancel_done_pickup">Reservation cancelled</string>
+    <string name="cancel_done_paid">Reservation cancelled. Your refund is on its way.</string>
+    <string name="cancel_failed">Couldn\'t cancel the reservation. Please try again.</string>
+    <string name="no_maps_app">No maps app found</string>
 </resources>

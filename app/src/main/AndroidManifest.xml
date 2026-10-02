@@ -82,6 +82,10 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".ReservationDetailActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".PaymentSuccessActivity"
             android:exported="false" />
 
