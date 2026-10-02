@@ -11,12 +11,22 @@ function toCents(amount) {
   return Math.round((Number(amount) || 0) * 100);
 }
 
+// Only payments that actually went through Stripe can be refunded.
+// Reservations from before Stripe was integrated carry ids like
+// "pi_simulated_<ts>" and never took real money.
+function isRealPayment(reservation) {
+  const id = reservation.paymentIntentId;
+  return reservation.paymentStatus === "paid" && typeof id === "string" && /^pi_[A-Za-z0-9]+$/.test(id);
+}
+
 // Reserved past its deadline.
 //   pickup: expired, counts as a missed pickup, nothing to refund
 //   card:   expired, refunded minus the 10% fee
+// Reservations from before payment methods existed (no paymentMethod) or
+// with simulated payments just expire: no strike, nothing to refund.
 function planExpiry(reservation, now) {
   if (reservation.status !== "reserved" || !(reservation.pickupDeadline <= now)) return null;
-  if (reservation.paymentMethod === "card") {
+  if (reservation.paymentMethod === "card" && isRealPayment(reservation)) {
     return {
       update: { status: "expired", expiredAt: now, paymentStatus: "refund_pending" },
       refundCents: Math.round(toCents(reservation.total) * EXPIRY_REFUND_RATE),
@@ -24,11 +34,14 @@ function planExpiry(reservation, now) {
       noShow: false,
     };
   }
-  return {
-    update: { status: "expired", expiredAt: now, noShow: true },
-    refundCents: 0,
-    noShow: true,
-  };
+  if (reservation.paymentMethod === "pickup") {
+    return {
+      update: { status: "expired", expiredAt: now, noShow: true },
+      refundCents: 0,
+      noShow: true,
+    };
+  }
+  return { update: { status: "expired", expiredAt: now }, refundCents: 0, noShow: false };
 }
 
 // The shopper cancels before the deadline: no strike, prepaid is refunded
@@ -45,7 +58,7 @@ function planCancel(reservation, uid, now) {
     throw new ReservationError("failed-precondition", "The pickup window has already ended.",
       { reason: "expired" });
   }
-  if (reservation.paymentMethod === "card") {
+  if (reservation.paymentMethod === "card" && isRealPayment(reservation)) {
     return {
       update: { status: "cancelled", cancelledAt: now, paymentStatus: "refund_pending" },
       refundCents: toCents(reservation.total),
@@ -63,6 +76,7 @@ module.exports = {
   ABANDONED_CHECKOUT_MS,
   EXPIRY_REFUND_RATE,
   isAbandonedCheckout,
+  isRealPayment,
   planCancel,
   planExpiry,
   toCents,

@@ -8,7 +8,9 @@
 const { FieldValue } = require("firebase-admin/firestore");
 
 const { ReservationError, releaseStock } = require("./plan");
-const { planCancel, planExpiry, isAbandonedCheckout, ABANDONED_CHECKOUT_MS } = require("./lifecycle");
+const {
+  planCancel, planExpiry, isAbandonedCheckout, ABANDONED_CHECKOUT_MS,
+} = require("./lifecycle");
 const { cancelPending } = require("./store");
 
 const BATCH_LIMIT = 200;
@@ -49,6 +51,12 @@ async function applyEnding(db, reservationId, plan) {
 // Returns true when Stripe accepted it.
 async function refund(db, stripe, reservationId, reservation) {
   if (reservation.paymentStatus !== "refund_pending" || !(reservation.refundCents > 0)) return false;
+  if (!/^pi_[A-Za-z0-9]+$/.test(reservation.paymentIntentId || "")) {
+    // Nothing real to refund (e.g. a pre-Stripe simulated payment): stop
+    // retrying instead of failing every sweep.
+    await db.doc(`reservations/${reservationId}`).update({ paymentStatus: "not_refundable" });
+    return false;
+  }
   try {
     const result = await stripe.refunds.create(
       { payment_intent: reservation.paymentIntentId, amount: reservation.refundCents },
