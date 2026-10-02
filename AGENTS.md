@@ -4,7 +4,9 @@
 QLess is a smart shopping app that helps users:
 - **Compare prices** across different stores for products (e.g., 5kg rice: Store A €12 vs Store B €9)
 - **Reserve & Pay** in-app to hold items at the store
-- **Collect within 48 hours** (10% penalty if not picked up, rest refunded)
+- **Collect within 12 or 48 hours**, depending on how they pay:
+  - **Pay at pickup**: 12h hold, no fee; a missed pickup is a strike, and 3 strikes means prepaying
+  - **Pay in the app**: 48h hold, €0.99 service fee; if not collected, refunded minus 10%
 - **Get ML-powered recommendations** based on viewing/buying behavior
 
 ## Current State (COMPLETE)
