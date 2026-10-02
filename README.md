@@ -26,7 +26,7 @@ No more wandering through crowded stores or missing out on the best deals. QLess
 | Feature | Description |
 |---------|-------------|
 | 🔍 **Price Comparison** | Compare prices across multiple stores in real-time |
-| 📦 **Reserve & Pay** | Reserve items and pay at pickup |
+| 📦 **Reserve & Pay** | Reserve items and pay at pickup, or pay in the app |
 | 📍 **Location Picker** | Set your location manually or use GPS |
 | 🛒 **Smart Cart** | Add items from different stores |
 | 📋 **Order History** | Track all your completed orders |
@@ -53,11 +53,11 @@ No more wandering through crowded stores or missing out on the best deals. QLess
 2. 📊 COMPARE   →  See prices across all partner stores  
 3. 🛒 ADD       →  Add to cart from best-priced store
 4. ✅ CHECKOUT  →  Confirm your reservation
-5. ⏰ 48 HOURS  →  Pick up within 48 hours
+5. ⏰ PICK UP   →  Within 12h (pay at pickup) or 48h (paid in the app)
 6. 🎉 COLLECT   →  Show reservation, pay, and go!
 ```
 
-> **Note:** If items aren't collected within 48 hours, a 10% restocking fee applies and the remainder is refunded.
+> **Note:** Reserved stock is held for you. Uncollected pay-at-pickup reservations count as a missed pickup, and 3 missed pickups means future orders must be paid in advance. Uncollected prepaid reservations are refunded minus a 10% restocking fee.
 
 ## 🛠 Tech Stack
 

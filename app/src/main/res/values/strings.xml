@@ -202,9 +202,9 @@
     <string name="faq">Frequently Asked Questions</string>
     <string name="follow_us">Follow Us</string>
     <string name="faq_question_1">How does QLess work?</string>
-    <string name="faq_answer_1">QLess lets you compare prices across stores, reserve items, and pick them up at your convenience. Simply browse products, add to cart, and confirm your reservation. You have 48 hours to collect your items.</string>
+    <string name="faq_answer_1">QLess lets you compare prices across stores, reserve items, and pick them up at your convenience. Simply browse products, add to cart, and confirm your reservation. If you pay at pickup you have 12 hours to collect your items; if you pay in the app you have 48 hours.</string>
     <string name="faq_question_2">What happens if I don\'t pick up my items?</string>
-    <string name="faq_answer_2">If you don\'t collect your reserved items within 48 hours, a 10% fee will be charged. The remaining amount will be refunded to your original payment method.</string>
+    <string name="faq_answer_2">If you chose to pay at pickup, the reservation is cancelled and counts as a missed pickup. After 3 missed pickups, future orders need to be paid in advance. If you paid in the app and don\'t collect within 48 hours, you\'re refunded minus a 10% fee.</string>
     <string name="faq_question_3">Can I cancel my reservation?</string>
     <string name="faq_answer_3">Yes, you can cancel your reservation anytime before pickup. Full refunds are provided for cancellations made within 24 hours of the reservation.</string>
     <string name="faq_question_4">How do I pay for my items?</string>
