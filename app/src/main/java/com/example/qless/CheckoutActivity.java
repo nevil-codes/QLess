@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.TaskStackBuilder;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -234,7 +235,7 @@ public class CheckoutActivity extends AppCompatActivity {
         }
         Map<String, Object> checkout = (Map<String, Object>) body;
         if (payAtPickup) {
-            showConfirmation(checkout, true);
+            showConfirmation(checkout);
             return;
         }
 
@@ -257,7 +258,7 @@ public class CheckoutActivity extends AppCompatActivity {
         if (result instanceof PaymentSheetResult.Completed) {
             // The reservation turns "reserved" when Stripe's webhook confirms
             // the payment; the sheet only tells us it went through.
-            showConfirmation(checkout, false);
+            showConfirmation(checkout);
             return;
         }
 
@@ -280,8 +281,10 @@ public class CheckoutActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Log.w(TAG, "cancelPendingPayment failed", e));
     }
 
+    // One store: open its reservation (code, countdown). Several stores:
+    // open the list. Either way Home sits underneath, not the empty cart.
     @SuppressWarnings("unchecked")
-    private void showConfirmation(Map<String, Object> checkout, boolean pickup) {
+    private void showConfirmation(Map<String, Object> checkout) {
         List<Map<String, Object>> reservations = checkout.get("reservations") instanceof List
                 ? (List<Map<String, Object>>) checkout.get("reservations") : new ArrayList<>();
         if (reservations.isEmpty()) {
@@ -289,26 +292,14 @@ public class CheckoutActivity extends AppCompatActivity {
             return;
         }
 
-        Map<String, Object> first = reservations.get(0);
-        List<String> storeNames = new ArrayList<>();
-        double reservedTotal = 0;
-        for (Map<String, Object> r : reservations) {
-            storeNames.add(String.valueOf(r.get("storeName")));
-            if (r.get("total") instanceof Number) reservedTotal += ((Number) r.get("total")).doubleValue();
-        }
-
         CartManager.getInstance().clear();
-        Intent intent = new Intent(this, PaymentSuccessActivity.class);
-        intent.putExtra(PaymentSuccessActivity.EXTRA_ORDER_ID, String.valueOf(first.get("reservationId")));
-        intent.putExtra(PaymentSuccessActivity.EXTRA_AMOUNT, reservedTotal);
-        intent.putExtra(PaymentSuccessActivity.EXTRA_STORE_NAME, joinStores(storeNames));
-        intent.putExtra(PaymentSuccessActivity.EXTRA_PAY_AT_PICKUP, pickup);
-        intent.putExtra(PaymentSuccessActivity.EXTRA_PICKUP_CODE, String.valueOf(first.get("pickupCode")));
-        if (first.get("pickupDeadline") instanceof Number) {
-            intent.putExtra(PaymentSuccessActivity.EXTRA_DEADLINE, ((Number) first.get("pickupDeadline")).longValue());
-        }
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        Intent next = reservations.size() == 1
+                ? ReservationDetailActivity.intent(this, String.valueOf(reservations.get(0).get("reservationId")))
+                : new Intent(this, ReservationsActivity.class);
+        TaskStackBuilder.create(this)
+                .addNextIntent(new Intent(this, HomeActivity.class))
+                .addNextIntent(next)
+                .startActivities();
         finish();
     }
 

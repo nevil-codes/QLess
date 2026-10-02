@@ -229,10 +229,6 @@
     <string name="invalid_card">Please enter valid card details</string>
     <string name="payment_cancelled">Payment cancelled</string>
     <string name="payment_confirmation_message">Your reservation has been confirmed. Please pick up your items within 48 hours.</string>
-    <string name="reserved_title">Reserved!</string>
-    <string name="reserved_pickup_message">Show your pickup code at the counter and pay there. Please collect within 12 hours.</string>
-    <string name="pickup_code">Pickup code</string>
-    <string name="pay_at_pickup_amount">Pay at pickup</string>
     <string name="order_id">Order ID</string>
     <string name="pickup_before">Pick up before</string>
     <string name="view_my_reservations">View My Reservations</string>
