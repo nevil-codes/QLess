@@ -34,7 +34,7 @@ node scripts/setAdmin.js admin@qless.com --revoke
 | products | Public | Admin | Admin | Admin |
 | stores | Public | Admin | Admin | Admin |
 | config | Public | Admin | Admin | Admin |
-| reservations | Own, admin | Own | Own (can't change `userId`), admin | Own |
+| reservations | Own, admin | Functions only | Admin (functions for payment state) | none |
 | orders | Own, admin | Own | Admin | Admin |
 | user_events | Admin | Own | none | none |
 | carts | Own | Own | Own | Own |
