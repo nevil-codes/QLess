@@ -5,7 +5,10 @@
 const HOUR_MS = 60 * 60 * 1000;
 
 const PICKUP_HOLD_HOURS = 12;
+const CARD_HOLD_HOURS = 48;
+const CARD_SERVICE_FEE = 0.99;
 const MAX_NO_SHOWS = 3;
+const PAYMENT_METHODS = ["pickup", "card"];
 const MAX_LINES = 50;
 const MAX_QUANTITY = 20;
 
@@ -28,8 +31,8 @@ function parseRequest(data) {
   if (data.items.length > MAX_LINES) {
     throw new ReservationError("invalid-argument", `at most ${MAX_LINES} items per reservation`);
   }
-  if (data.paymentMethod !== "pickup") {
-    throw new ReservationError("invalid-argument", "paymentMethod must be \"pickup\"");
+  if (!PAYMENT_METHODS.includes(data.paymentMethod)) {
+    throw new ReservationError("invalid-argument", "paymentMethod must be \"pickup\" or \"card\"");
   }
 
   const merged = new Map();
@@ -63,11 +66,15 @@ function pickupCode(random) {
 
 // Builds the reservation docs and the new `prices` arrays for every product
 // whose stock changes.
+//   paymentMethod: "pickup" (reserved now, pay in store, 12h) or "card"
+//     (pending until Stripe confirms payment, 48h, one service fee per
+//     checkout charged on the first reservation)
 //   products: { id: productData }, stores: { id: storeData }
 //   user: users/{uid} data (or null); codes: { storeId: pickupCode }
 //   ids: { storeId: reservationId }
-function planPickupReservations({ uid, lines, products, stores, user, codes, ids, now }) {
-  if (((user && user.noShowCount) || 0) >= MAX_NO_SHOWS) {
+function planReservations({ uid, paymentMethod, lines, products, stores, user, codes, ids, now }) {
+  const card = paymentMethod === "card";
+  if (!card && ((user && user.noShowCount) || 0) >= MAX_NO_SHOWS) {
     throw new ReservationError("failed-precondition",
       "Too many missed pickups; please pay in advance.", { reason: "prepay-required" });
   }
@@ -112,8 +119,9 @@ function planPickupReservations({ uid, lines, products, stores, user, codes, ids
       { reason: "unavailable", productIds: unavailable });
   }
 
-  const reservations = Object.values(byStore).map((group) => {
+  const reservations = Object.values(byStore).map((group, index) => {
     const subtotal = round2(group.items.reduce((sum, i) => sum + i.price * i.quantity, 0));
+    const serviceFee = card && index === 0 ? CARD_SERVICE_FEE : 0;
     const reservationId = ids[group.storeId];
     return {
       reservationId,
@@ -123,26 +131,44 @@ function planPickupReservations({ uid, lines, products, stores, user, codes, ids
       storeAddress: group.storeAddress,
       items: group.items,
       subtotal,
-      serviceFee: 0,
-      total: subtotal,
-      paymentMethod: "pickup",
-      paymentStatus: "none",
-      status: "reserved",
+      serviceFee,
+      total: round2(subtotal + serviceFee),
+      paymentMethod,
+      paymentStatus: card ? "pending" : "none",
+      status: card ? "pending_payment" : "reserved",
       pickupCode: codes[group.storeId],
       createdAt: now,
-      pickupDeadline: now + PICKUP_HOLD_HOURS * HOUR_MS,
+      pickupDeadline: now + (card ? CARD_HOLD_HOURS : PICKUP_HOLD_HOURS) * HOUR_MS,
     };
   });
 
   return { reservations, newPrices };
 }
 
+// New `prices` arrays that put a reservation's held stock back.
+//   products: { id: productData } for every product in the reservation
+function releaseStock(reservation, products) {
+  const newPrices = {};
+  for (const item of reservation.items || []) {
+    const product = products[item.productId];
+    if (!product) continue;
+    const prices = newPrices[item.productId] || (product.prices || []).map((p) => ({ ...p }));
+    const offer = prices.find((p) => p && p.storeId === item.storeId);
+    if (offer && offer.quantity != null) offer.quantity += item.quantity;
+    newPrices[item.productId] = prices;
+  }
+  return newPrices;
+}
+
 module.exports = {
+  CARD_HOLD_HOURS,
+  CARD_SERVICE_FEE,
   HOUR_MS,
   MAX_NO_SHOWS,
   PICKUP_HOLD_HOURS,
   ReservationError,
   parseRequest,
   pickupCode,
-  planPickupReservations,
+  planReservations,
+  releaseStock,
 };
