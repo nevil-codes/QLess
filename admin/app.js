@@ -1019,7 +1019,6 @@ function loadOrders() {
             const isReservation = order.type === 'reservation';
             const actionButtons = isReservation ? `
                 <button class="btn btn-sm" title="Mark as Picked Up" onclick="updateReservation('${order.id}','picked_up')">📦</button>
-                <button class="btn btn-danger btn-sm" title="Mark as Expired" onclick="updateReservation('${order.id}','expired')">⏰</button>
                 <button class="btn btn-sm" title="View Details" onclick="viewOrderDetails('${order.id}', 'reservation')"><i class="fas fa-eye"></i></button>
             ` : `
                 <button class="btn btn-sm" title="Mark as Completed" onclick="updateOrderStatus('${order.id}','completed')">✅</button>
