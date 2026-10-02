@@ -116,17 +116,14 @@ describe("reservations", () => {
     await assertSucceeds(updateDoc(doc(admin(), "reservations/r1"), { status: "picked_up" }));
   });
 
-  test("owner can create and update own, but not reassign it", async () => {
-    await assertSucceeds(setDoc(doc(shopper(), "reservations/r2"), { userId: "shopper" }));
-    await assertSucceeds(updateDoc(doc(shopper(), "reservations/r1"), { status: "cancelled" }));
-    await assertFails(updateDoc(doc(shopper(), "reservations/r1"), { userId: "other" }));
+  test("shoppers can't create, edit, pay for or delete reservations", async () => {
+    await assertFails(setDoc(doc(shopper(), "reservations/r2"), { userId: "shopper", status: "reserved" }));
+    await assertFails(updateDoc(doc(shopper(), "reservations/r1"), { status: "cancelled" }));
+    await assertFails(updateDoc(doc(shopper(), "reservations/r1"), { paymentStatus: "paid" }));
+    await assertFails(deleteDoc(doc(shopper(), "reservations/r1")));
   });
 
-  test("cannot create a reservation for someone else", async () => {
-    await assertFails(setDoc(doc(other(), "reservations/r3"), { userId: "shopper" }));
-  });
-
-  test("other user cannot update or delete", async () => {
+  test("other users can't touch someone else's reservation", async () => {
     await assertFails(updateDoc(doc(other(), "reservations/r1"), { status: "cancelled" }));
     await assertFails(deleteDoc(doc(other(), "reservations/r1")));
   });

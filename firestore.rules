@@ -65,14 +65,13 @@ service cloud.firestore {
     // ============================================
     // RESERVATIONS
     // ============================================
-    // Owners still create and update their own reservations because
-    // checkout and payment run on the client for now. Admins can read
-    // and update every reservation (status changes from the panel).
+    // Reservations are created, paid for and cancelled by Cloud Functions
+    // (createReservation, stripeWebhook, cancelPendingPayment), which also
+    // hold and release stock. Shoppers can only read their own; admins can
+    // read all and update status from the panel.
     match /reservations/{reservationId} {
       allow read: if ownsDoc() || isAdmin();
-      allow create: if createsOwn();
-      allow update: if (ownsDoc() && !changes(['userId'])) || isAdmin();
-      allow delete: if ownsDoc();
+      allow update: if isAdmin();
     }
 
     match /orders/{orderId} {
