@@ -18,3 +18,4 @@ exports.getSimilarProducts = callables.getSimilarProducts;
 exports.getPeopleAlsoBuy = callables.getPeopleAlsoBuy;
 
 exports.createReservation = reservations.createReservation;
+exports.cancelPendingPayment = reservations.cancelPendingPayment;

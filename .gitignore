@@ -26,3 +26,4 @@ local.properties
 *-debug.log
 functions/node_modules/
 *-firebase-adminsdk-*.json
+functions/.secret.local
