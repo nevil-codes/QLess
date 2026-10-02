@@ -3,8 +3,11 @@ const { getFirestore } = require("firebase-admin/firestore");
 
 const api = require("./api");
 
+// invoker: "public" lets the app reach the function at the Cloud Run level;
+// Firebase Auth is still checked in the handler. Declared explicitly so
+// every deploy enforces it (by default it's only set on first create).
 function callable(handler) {
-  return onCall(async (request) => {
+  return onCall({ invoker: "public" }, async (request) => {
     try {
       return await handler(getFirestore(), request);
     } catch (err) {
