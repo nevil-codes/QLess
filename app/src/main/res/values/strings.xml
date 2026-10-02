@@ -280,4 +280,13 @@
     <string name="items_preview_line">%1$dx %2$s</string>
     <string name="available_for_pickup">Available for pickup</string>
     <string name="reservations_load_failed">Couldn\'t load your reservations.</string>
+    <!-- Home: active reservation -->
+    <string name="nav_pickups">Pickups</string>
+    <plurals name="reservations_ready">
+        <item quantity="one">%d reservation ready</item>
+        <item quantity="other">%d reservations ready</item>
+    </plurals>
+    <string name="active_reservation_subtitle">%1$s · collect within %2$s</string>
+    <string name="time_left_hours">%1$d h</string>
+    <string name="time_left_minutes">%1$d min</string>
 </resources>
