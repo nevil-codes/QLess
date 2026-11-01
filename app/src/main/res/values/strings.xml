@@ -146,9 +146,9 @@
     <string name="pickup_window_pickup">Items are held for 12 hours</string>
     <string name="pickup_window_card">Items are held for 48 hours</string>
     <string name="missed_pickup_policy_pickup">Not collecting in time counts as a missed pickup</string>
-    <string name="missed_pickup_policy_card">10% fee if not picked up on time</string>
+    <string name="missed_pickup_policy_card" formatted="false">10% fee if not picked up on time</string>
     <string name="payment_notice_pickup">Nothing is charged now. You pay the store when you collect. After 3 missed pickups, orders must be paid in advance.</string>
-    <string name="payment_notice_card">You pay now. If you don\'t collect within 48 hours, you\'re refunded minus a 10% fee.</string>
+    <string name="payment_notice_card" formatted="false">You pay now. If you don\'t collect within 48 hours, you\'re refunded minus a 10% fee.</string>
     <string name="reserve_pay_at_pickup">Reserve · pay at pickup</string>
     <string name="continue_to_payment">Continue to payment</string>
     <string name="deadline_before">Before %1$s</string>
@@ -204,7 +204,7 @@
     <string name="faq_question_1">How does QLess work?</string>
     <string name="faq_answer_1">QLess lets you compare prices across stores, reserve items, and pick them up at your convenience. Simply browse products, add to cart, and confirm your reservation. If you pay at pickup you have 12 hours to collect your items; if you pay in the app you have 48 hours.</string>
     <string name="faq_question_2">What happens if I don\'t pick up my items?</string>
-    <string name="faq_answer_2">If you chose to pay at pickup, the reservation is cancelled and counts as a missed pickup. After 3 missed pickups, future orders need to be paid in advance. If you paid in the app and don\'t collect within 48 hours, you\'re refunded minus a 10% fee.</string>
+    <string name="faq_answer_2" formatted="false">If you chose to pay at pickup, the reservation is cancelled and counts as a missed pickup. After 3 missed pickups, future orders need to be paid in advance. If you paid in the app and don\'t collect within 48 hours, you\'re refunded minus a 10% fee.</string>
     <string name="faq_question_3">Can I cancel my reservation?</string>
     <string name="faq_answer_3">Yes, any time before your pickup window ends: open the reservation from Pickups and tap Cancel reservation. Pay-at-pickup reservations are cancelled without counting as a missed pickup, and prepaid ones are refunded in full, including the service fee.</string>
     <string name="faq_question_4">How do I pay for my items?</string>
@@ -252,7 +252,7 @@
     <string name="reservation_picked_up_desc">Thanks for shopping with QLess.</string>
     <string name="reservation_expired">Reservation expired</string>
     <string name="reservation_expired_desc_pickup">It wasn\'t collected in time, so it counts as a missed pickup.</string>
-    <string name="reservation_expired_desc_paid">It wasn\'t collected in time. You\'ve been refunded minus a 10% fee.</string>
+    <string name="reservation_expired_desc_paid" formatted="false">It wasn\'t collected in time. You\'ve been refunded minus a 10% fee.</string>
     <string name="reservation_cancelled">Reservation cancelled</string>
     <string name="reservation_cancelled_desc_pickup">The items are back on the shelf.</string>
     <string name="reservation_cancelled_desc_paid">You\'ve been refunded in full.</string>
